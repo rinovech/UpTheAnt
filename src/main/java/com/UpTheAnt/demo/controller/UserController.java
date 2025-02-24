@@ -3,6 +3,7 @@ package com.UpTheAnt.demo.controller;
 import com.UpTheAnt.demo.model.User;
 import com.UpTheAnt.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,8 +27,10 @@ public class UserController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+        user.setUserId(1); 
+        return user;
     }
 
     @DeleteMapping("/{id}")
