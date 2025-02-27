@@ -1,35 +1,40 @@
 package com.UpTheAnt.demo.service;
 
 import com.UpTheAnt.demo.model.User;
+import com.UpTheAnt.demo.repository.UserRepository;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
 
-    private final List<User> users = new ArrayList<>();
-    private Integer nextUserId = 1;
+    private final UserRepository userRepository;
+
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
 
     public List<User> getAllUsers() {
-        return users;
+        return userRepository.findAll();
     }
 
     public Optional<User> getUserById(Integer id) {
-        return users.stream()
-                .filter(user -> user.getUserId().equals(id))
-                .findFirst();
+        return userRepository.findById(id);
     }
 
     public User createUser(User user) {
-        user.setUserId(nextUserId++);
-        users.add(user);
-        return user;
+        return userRepository.save(user);
     }
 
     public void deleteUser(Integer id) {
-        users.removeIf(user -> user.getUserId().equals(id));
+        userRepository.deleteById(id);
     }
 }

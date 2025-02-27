@@ -2,10 +2,16 @@ package com.UpTheAnt.demo.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "auctions") 
 public class Auction {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer auctionId;
+    
     private String name;
     private String description;
     private BigDecimal startPrice;
@@ -13,10 +19,22 @@ public class Auction {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private BigDecimal currentBid;
-    private boolean status; // true - открыт, false - закрыт
-    private Integer userId; // Идентификатор пользователя-организатора
+    private boolean status;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // Геттеры и сеттеры
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+   
     public Integer getAuctionId() {
         return auctionId;
     }
@@ -89,11 +107,19 @@ public class Auction {
         this.status = status;
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    @Override
+    public String toString() {
+    return "Auction{" +
+            "auctionId=" + auctionId +
+            ", name=" + name +
+            ", descption=" + description +
+            ", startPrice=" + startPrice +
+            ", minBidStep=" + minBidStep +
+            ", startTime=" + startTime +
+            ", endTime=" + endTime +
+            ", currentBid=" + currentBid +
+            ", ststus=" + status +
+            ", user=" + (user != null ? user.getUserId() : "null") +
+            '}';
     }
 }

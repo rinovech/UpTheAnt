@@ -1,35 +1,37 @@
 package com.UpTheAnt.demo.service;
 
 import com.UpTheAnt.demo.model.Auction;
+import com.UpTheAnt.demo.repository.AuctionRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class AuctionService {
 
-    private final List<Auction> auctions = new ArrayList<>();
-    private Integer nextAuctionId = 1;
+    private final AuctionRepository auctionRepository;
+
+    @Autowired
+    public AuctionService(AuctionRepository auctionRepository) {
+        this.auctionRepository = auctionRepository;
+    }
 
     public List<Auction> getAllAuctions() {
-        return auctions;
+        return auctionRepository.findAll();
     }
 
     public Optional<Auction> getAuctionById(Integer id) {
-        return auctions.stream()
-                .filter(auction -> auction.getAuctionId().equals(id))
-                .findFirst();
+        return auctionRepository.findById(id);
     }
 
     public Auction createAuction(Auction auction) {
-        auction.setAuctionId(nextAuctionId++);
-        auctions.add(auction);
-        return auction;
+        return auctionRepository.save(auction);
     }
 
     public void deleteAuction(Integer id) {
-        auctions.removeIf(auction -> auction.getAuctionId().equals(id));
+        auctionRepository.deleteById(id);
     }
 }

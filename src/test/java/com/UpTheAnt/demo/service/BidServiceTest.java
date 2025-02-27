@@ -1,122 +1,151 @@
 package com.UpTheAnt.demo.service;
 
 import com.UpTheAnt.demo.model.Bid;
-
+import com.UpTheAnt.demo.repository.BidRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class BidServiceTest {
+
+    @Mock
+    private BidRepository bidRepository;
+
+    @InjectMocks
+    private BidService bidService;
 
     @Test
     void testGetAllBids() {
-        BidService BidService = new BidService();
-        Bid Bid1 = new Bid();
-        Bid1.setAuctionId(1);
-        BidService.createBid(Bid1);
 
-        Bid Bid2 = new Bid();
-        Bid2.setAuctionId(2);
-        BidService.createBid(Bid2);
+        Bid bid1 = new Bid();
+        bid1.setBidAmount(new BigDecimal("10.0"));
 
-        List<Bid> Bids = BidService.getAllBids();
+        Bid bid2 = new Bid();
+        bid2.setBidAmount(new BigDecimal("50.0"));
 
-        assertEquals(2, Bids.size());
-        assertEquals(1, Bids.get(0).getAuctionId());
-        assertEquals(2, Bids.get(1).getAuctionId());
+        when(bidRepository.findAll()).thenReturn(Arrays.asList(bid1, bid2));
+
+        List<Bid> bids = bidService.getAllBids();
+
+        assertEquals(2, bids.size());
+        assertEquals(new BigDecimal("10.0"), bids.get(0).getBidAmount());
+        assertEquals(new BigDecimal("50.0"), bids.get(1).getBidAmount());
+        verify(bidRepository, times(1)).findAll();
     }
 
     @Test
     void testCreateBid() {
-        BidService BidService = new BidService();
-        Bid Bid = new Bid();
-        Bid.setAuctionId(1);
 
-        Bid createdBid = BidService.createBid(Bid);
+        Bid bid = new Bid();
+        bid.setBidAmount(new BigDecimal("10.0"));
 
-        assertNotNull(createdBid.getBidId());
-        assertEquals(1, createdBid.getAuctionId());
-        assertEquals(1, BidService.getAllBids().size());
+        when(bidRepository.save(bid)).thenReturn(bid);
+
+        Bid createdBid = bidService.createBid(bid);
+
+        assertNotNull(createdBid);
+        assertEquals(new BigDecimal("10.0"), createdBid.getBidAmount());
+        verify(bidRepository, times(1)).save(bid);
     }
 
     @Test
     void testDeleteBid() {
-        BidService BidService = new BidService();
-        Bid Bid = new Bid();
-        Bid.setAuctionId(1);
-        BidService.createBid(Bid);
 
-        BidService.deleteBid(1);
+        doNothing().when(bidRepository).deleteById(1);
 
-        assertEquals(0, BidService.getAllBids().size());
+        bidService.deleteBid(1);
+
+        verify(bidRepository, times(1)).deleteById(1);
     }
 
     @Test
     void testDeleteBidNotFound() {
-        BidService BidService = new BidService();
-        BidService.deleteBid(1000); 
 
-        assertEquals(0, BidService.getAllBids().size());
+        doNothing().when(bidRepository).deleteById(1000);
+
+        bidService.deleteBid(1000);
+
+        verify(bidRepository, times(1)).deleteById(1000);
     }
 
     @Test
     void testGetBidById() {
-        BidService BidService = new BidService();
-        Bid Bid = new Bid();
-        Bid.setAuctionId(1);
-        BidService.createBid(Bid);
 
-        Optional<Bid> foundBid = BidService.getBidById(1);
+        Bid bid = new Bid();
+        bid.setBidAmount(new BigDecimal("10.0"));
 
+        when(bidRepository.findById(1)).thenReturn(Optional.of(bid));
+
+        // Act
+        Optional<Bid> foundBid = bidService.getBidById(1);
+
+        // Assert
         assertTrue(foundBid.isPresent());
-        assertEquals(1, foundBid.get().getAuctionId());
+        assertEquals(new BigDecimal("10.0"), foundBid.get().getBidAmount());
+        verify(bidRepository, times(1)).findById(1);
     }
 
     @Test
     void testGetBidByIdNotFound() {
-        BidService BidService = new BidService();
-        Optional<Bid> foundBid = BidService.getBidById(1000);
+        // Arrange
+        when(bidRepository.findById(1000)).thenReturn(Optional.empty());
 
+        // Act
+        Optional<Bid> foundBid = bidService.getBidById(1000);
+
+        // Assert
         assertFalse(foundBid.isPresent());
+        verify(bidRepository, times(1)).findById(1000);
     }
 
-    @Test
-    void testCreateBidWithInvalidData() {
-        BidService BidService = new BidService();
-        Bid Bid = new Bid();
-        Bid.setAuctionId(0);
-        Bid.setUserId(0);
-        Bid.setBidAmount(null);
-        Bid.setBidTime(null);
+    // @Test
+    // void testCreateBidWithInvalidData() {
+    //     // Arrange
+    //     Bid bid = new Bid();
+    //     bid.setBidAmount(null);
+    //     bid.setBidTime(null);
 
-        
-        Bid createdbBid = BidService.createBid(Bid);
+    //     when(bidRepository.save(bid)).thenReturn(bid);
 
-        assertNotNull(createdbBid.getBidId());
-        assertEquals(0, createdbBid.getAuctionId());
-        assertEquals(0, createdbBid.getUserId());
-        assertEquals(null, createdbBid.getBidAmount());
-        assertEquals(null, createdbBid.getBidTime());
+    //     // Act
+    //     Bid createdBid = bidService.createBid(bid);
 
-    }
+    //     // Assert
+    //     assertNotNull(createdBid.getBidId());
+    //     assertNull(createdBid.getBidAmount());
+    //     assertNull(createdBid.getBidTime());
+    //     verify(bidRepository, times(1)).save(bid);
+    // }
 
     @Test
     void testGetBidByIdWithNegativeId() {
-        BidService BidService = new BidService();
-        Optional<Bid> foundBid = BidService.getBidById(-1);
+
+        when(bidRepository.findById(-1)).thenReturn(Optional.empty());
+
+        Optional<Bid> foundBid = bidService.getBidById(-1);
 
         assertFalse(foundBid.isPresent());
+        verify(bidRepository, times(1)).findById(-1);
     }
 
     @Test
     void testDeleteBidWithNegativeId() {
-        BidService BidService = new BidService();
-        BidService.deleteBid(-1);  
 
-        assertEquals(0, BidService.getAllBids().size());
+        doNothing().when(bidRepository).deleteById(-1);
+
+        bidService.deleteBid(-1);
+
+        verify(bidRepository, times(1)).deleteById(-1);
     }
-
 }

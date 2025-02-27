@@ -1,35 +1,37 @@
 package com.UpTheAnt.demo.service;
 
 import com.UpTheAnt.demo.model.Bid;
+import com.UpTheAnt.demo.repository.BidRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class BidService {
 
-    private final List<Bid> bids = new ArrayList<>();
-    private Integer nextBidId = 1;
+    private final BidRepository bidRepository;
+
+    @Autowired
+    public BidService(BidRepository bidRepository) {
+        this.bidRepository = bidRepository;
+    }
 
     public List<Bid> getAllBids() {
-        return bids;
+        return bidRepository.findAll();
     }
 
     public Optional<Bid> getBidById(Integer id) {
-        return bids.stream()
-                .filter(bid -> bid.getBidId().equals(id))
-                .findFirst();
+        return bidRepository.findById(id);
     }
 
     public Bid createBid(Bid bid) {
-        bid.setBidId(nextBidId++);
-        bids.add(bid);
-        return bid;
+        return bidRepository.save(bid);
     }
 
     public void deleteBid(Integer id) {
-        bids.removeIf(bid -> bid.getBidId().equals(id));
+        bidRepository.deleteById(id);
     }
 }
