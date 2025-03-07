@@ -1,7 +1,8 @@
-package com.UpTheAnt.demo.repository;
+package com.uptheant.demo.repository;
 
-import com.UpTheAnt.demo.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.uptheant.demo.model.User;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 }

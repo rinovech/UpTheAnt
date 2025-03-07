@@ -1,11 +1,12 @@
-package com.UpTheAnt.demo.controller;
+package com.uptheant.demo.controller;
 
-import com.UpTheAnt.demo.model.Bid;
-import com.UpTheAnt.demo.service.BidService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.uptheant.demo.model.Bid;
+import com.uptheant.demo.service.BidService;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,8 +37,8 @@ public class BidController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteBid(@PathVariable Integer id) {
+    public ResponseEntity<String> deleteBid(@PathVariable Integer id) {
         bidService.deleteBid(id);
+        return ResponseEntity.ok("Bid with ID " + id + " was successfully deleted.");
     }
 }

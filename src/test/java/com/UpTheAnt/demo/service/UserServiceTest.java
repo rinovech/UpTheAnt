@@ -1,12 +1,13 @@
-package com.UpTheAnt.demo.service;
+package com.uptheant.demo.service;
 
-import com.UpTheAnt.demo.model.User;
-import com.UpTheAnt.demo.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.uptheant.demo.model.User;
+import com.uptheant.demo.repository.UserRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -103,27 +104,6 @@ public class UserServiceTest {
 
         verify(userRepository, times(1)).deleteById(999);
     }
-
-    // @Test
-    // void testCreateUserWithInvalidData() {
-
-    //     User user = new User();
-    //     user.setName(""); // Пустое имя
-    //     user.setUsername(""); // Пустой username
-    //     user.setEmail(""); // Пустой email
-    //     user.setPassword(""); // Пустой пароль
-
-    //     when(userRepository.save(user)).thenReturn(user);
-
-    //     User createdUser = userService.createUser(user);
-
-    //     assertNotNull(createdUser);
-    //     assertEquals("", createdUser.getName());
-    //     assertEquals("", createdUser.getUsername());
-    //     assertEquals("", createdUser.getEmail());
-    //     assertEquals("", createdUser.getPassword());
-    //     verify(userRepository, times(1)).save(user);
-    // }
 
     @Test
     void testGetUserByIdWithNegativeId() {

@@ -1,4 +1,4 @@
-package com.UpTheAnt.demo.model;
+package com.uptheant.demo.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

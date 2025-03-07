@@ -1,4 +1,4 @@
-package com.UpTheAnt.demo.repository;
+package com.uptheant.demo.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.UpTheAnt.demo.model.User;
+import com.uptheant.demo.model.User;
+
 
 @DataJpaTest(properties = {
     "spring.datasource.url=jdbc:h2:mem:testdb",

@@ -1,11 +1,12 @@
-package com.UpTheAnt.demo.controller;
+package com.uptheant.demo.controller;
 
-import com.UpTheAnt.demo.model.Auction;
-import com.UpTheAnt.demo.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.uptheant.demo.model.Auction;
+import com.uptheant.demo.service.AuctionService;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,8 +37,8 @@ public class AuctionController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAuction(@PathVariable Integer id) {
+    public ResponseEntity<String> deleteAuction(@PathVariable Integer id) {
         auctionService.deleteAuction(id);
+        return ResponseEntity.ok("Auction with ID " + id + " was successfully deleted.");
     }
 }

@@ -1,7 +1,8 @@
-package com.UpTheAnt.demo.repository;
+package com.uptheant.demo.repository;
 
-import com.UpTheAnt.demo.model.Bid;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.uptheant.demo.model.Bid;
 
 public interface BidRepository extends JpaRepository<Bid, Integer> {
 }

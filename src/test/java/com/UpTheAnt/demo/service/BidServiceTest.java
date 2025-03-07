@@ -1,12 +1,13 @@
-package com.UpTheAnt.demo.service;
+package com.uptheant.demo.service;
 
-import com.UpTheAnt.demo.model.Bid;
-import com.UpTheAnt.demo.repository.BidRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.uptheant.demo.model.Bid;
+import com.uptheant.demo.repository.BidRepository;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -108,25 +109,6 @@ public class BidServiceTest {
         assertFalse(foundBid.isPresent());
         verify(bidRepository, times(1)).findById(1000);
     }
-
-    // @Test
-    // void testCreateBidWithInvalidData() {
-    //     // Arrange
-    //     Bid bid = new Bid();
-    //     bid.setBidAmount(null);
-    //     bid.setBidTime(null);
-
-    //     when(bidRepository.save(bid)).thenReturn(bid);
-
-    //     // Act
-    //     Bid createdBid = bidService.createBid(bid);
-
-    //     // Assert
-    //     assertNotNull(createdBid.getBidId());
-    //     assertNull(createdBid.getBidAmount());
-    //     assertNull(createdBid.getBidTime());
-    //     verify(bidRepository, times(1)).save(bid);
-    // }
 
     @Test
     void testGetBidByIdWithNegativeId() {

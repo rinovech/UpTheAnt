@@ -1,7 +1,8 @@
-package com.UpTheAnt.demo.repository;
+package com.uptheant.demo.repository;
 
-import com.UpTheAnt.demo.model.Auction;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.uptheant.demo.model.Auction;
 
 public interface AuctionRepository extends JpaRepository<Auction, Integer> {
 }

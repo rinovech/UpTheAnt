@@ -1,12 +1,11 @@
-package com.UpTheAnt.demo.service;
-
-import com.UpTheAnt.demo.model.User;
-import com.UpTheAnt.demo.repository.UserRepository;
-
+package com.uptheant.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
+
+import com.uptheant.demo.model.User;
+import com.uptheant.demo.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;

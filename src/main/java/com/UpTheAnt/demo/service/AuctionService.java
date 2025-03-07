@@ -1,10 +1,10 @@
-package com.UpTheAnt.demo.service;
-
-import com.UpTheAnt.demo.model.Auction;
-import com.UpTheAnt.demo.repository.AuctionRepository;
+package com.uptheant.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.uptheant.demo.model.Auction;
+import com.uptheant.demo.repository.AuctionRepository;
 
 import java.util.List;
 import java.util.Optional;

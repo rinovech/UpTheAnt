@@ -1,4 +1,4 @@
-package com.UpTheAnt.demo.controller;
+package com.uptheant.demo.controller;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -7,12 +7,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.uptheant.demo.model.User;
+import com.uptheant.demo.repository.UserRepository;
 
 import org.springframework.http.MediaType;
-
-import com.UpTheAnt.demo.model.User;
-import com.UpTheAnt.demo.repository.UserRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

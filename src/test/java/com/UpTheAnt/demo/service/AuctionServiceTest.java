@@ -1,12 +1,13 @@
-package com.UpTheAnt.demo.service;
+package com.uptheant.demo.service;
 
-import com.UpTheAnt.demo.model.Auction;
-import com.UpTheAnt.demo.repository.AuctionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.uptheant.demo.model.Auction;
+import com.uptheant.demo.repository.AuctionRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -95,35 +96,6 @@ public class AuctionServiceTest {
 
         verify(auctionRepository, times(1)).deleteById(999);
     }
-
-    // @Test
-    // void testCreateAuctionWithInvalidData() {
-    //     Auction auction = new Auction();
-    //     auction.setName("");
-    //     auction.setDescription("");
-    //     auction.setMinBidStep(new BigDecimal("0.0"));
-    //     auction.setStartPrice(new BigDecimal("0.0"));
-    //     auction.setStartTime(null);
-    //     auction.setEndTime(null);
-    //     auction.setCurrentBid(new BigDecimal("0.0"));
-    //     auction.setStatus(false);
-    //     auction.setUserId(null);
-
-    //     when(auctionRepository.save(auction)).thenReturn(auction);
-
-    //     Auction createdAuction = auctionService.createAuction(auction);
-
-    //     assertNotNull(createdAuction.getAuctionId());
-    //     assertEquals("", createdAuction.getName());
-    //     assertEquals("", createdAuction.getDescription());
-    //     assertEquals(new BigDecimal("0.0"), createdAuction.getMinBidStep());
-    //     assertEquals(new BigDecimal("0.0"), createdAuction.getStartPrice());
-    //     assertNull(createdAuction.getStartTime());
-    //     assertNull(createdAuction.getEndTime());
-    //     assertEquals(new BigDecimal("0.0"), createdAuction.getCurrentBid());
-    //     assertFalse(createdAuction.isStatus());
-    //     assertNull(createdAuction.getUserId());
-    // }
 
     @Test
     void testGetAuctionByIdWithNegativeId() {
