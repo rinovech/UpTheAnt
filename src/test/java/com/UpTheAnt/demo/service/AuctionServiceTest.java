@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.uptheant.demo.model.Auction;
 import com.uptheant.demo.repository.AuctionRepository;
+import com.uptheant.demo.service.auction.AuctionServiceImpl;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +24,7 @@ public class AuctionServiceTest {
     private AuctionRepository auctionRepository;
 
     @InjectMocks
-    private AuctionService auctionService;
+    private AuctionServiceImpl auctionService;
 
     @Test
     void testGetAllAuctions() {

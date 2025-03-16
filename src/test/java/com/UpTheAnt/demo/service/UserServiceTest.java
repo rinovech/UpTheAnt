@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.uptheant.demo.model.User;
 import com.uptheant.demo.repository.UserRepository;
+import com.uptheant.demo.service.user.UserServiceImpl;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +24,7 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Test
     void testGetAllUsers() {

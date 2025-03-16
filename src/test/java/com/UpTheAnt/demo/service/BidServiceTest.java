@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.uptheant.demo.model.Bid;
 import com.uptheant.demo.repository.BidRepository;
+import com.uptheant.demo.service.bid.BidServiceImpl;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -24,7 +25,7 @@ public class BidServiceTest {
     private BidRepository bidRepository;
 
     @InjectMocks
-    private BidService bidService;
+    private BidServiceImpl bidService;
 
     @Test
     void testGetAllBids() {

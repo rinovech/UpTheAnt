@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.uptheant.demo.model.Auction;
-import com.uptheant.demo.service.AuctionService;
+import com.uptheant.demo.service.auction.AuctionService;
 
 import java.util.List;
 import java.util.Optional;

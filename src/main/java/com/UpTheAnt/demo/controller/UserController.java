@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.uptheant.demo.model.User;
-import com.uptheant.demo.service.UserService;
+import com.uptheant.demo.service.user.UserService;
 
 import java.util.List;
 import java.util.Optional;
