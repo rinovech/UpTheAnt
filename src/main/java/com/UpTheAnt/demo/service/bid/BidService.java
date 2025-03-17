@@ -1,13 +1,13 @@
 package com.uptheant.demo.service.bid;
 
-import com.uptheant.demo.model.Bid;
+import com.uptheant.demo.dto.bid.BidCreateDTO;
+import com.uptheant.demo.dto.bid.BidResponseDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BidService {
-    List<Bid> getAllBids();
-    Optional<Bid> getBidById(Integer id);
-    Bid createBid(Bid bid);
+    List<BidResponseDTO> getAllBids();
+    BidResponseDTO getBidById(Integer id);
+    BidResponseDTO createBid(BidCreateDTO bidCreateDTO, Integer userId, Integer auctionId);
     void deleteBid(Integer id);
 } 

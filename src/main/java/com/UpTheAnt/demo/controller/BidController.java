@@ -5,35 +5,43 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.uptheant.demo.model.Bid;
+import com.uptheant.demo.dto.bid.BidCreateDTO;
+import com.uptheant.demo.dto.bid.BidResponseDTO;
 import com.uptheant.demo.service.bid.BidService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/bids")
 public class BidController {
 
+    private final BidService bidService;
+
     @Autowired
-    private BidService bidService;
+    public BidController(BidService bidService) {
+        this.bidService = bidService;
+    }
+
 
     @GetMapping
-    public List<Bid> getAllBids() {
+    public List<BidResponseDTO> getAllBids() {
         return bidService.getAllBids();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Bid> getBidById(@PathVariable Integer id) {
-        Optional<Bid> bid = bidService.getBidById(id);
-        return bid.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    public ResponseEntity<BidResponseDTO> getBidById(@PathVariable Integer id) {
+        try {
+            BidResponseDTO bid = bidService.getBidById(id);
+            return ResponseEntity.ok(bid);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Bid createBid(@RequestBody Bid bid) {
-        return bidService.createBid(bid);
+    public BidResponseDTO createBid(@RequestBody BidCreateDTO bidCreateDTO, @RequestParam Integer userId, @RequestParam Integer auctionId) {
+        return bidService.createBid(bidCreateDTO, userId, auctionId);
     }
 
     @DeleteMapping("/{id}")

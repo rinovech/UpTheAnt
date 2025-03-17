@@ -1,13 +1,15 @@
 package com.uptheant.demo.service.user;
 
-import com.uptheant.demo.model.User;
+import com.uptheant.demo.dto.user.UserCreateDTO;
+import com.uptheant.demo.dto.user.UserResponseDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
-    List<User> getAllUsers();
-    Optional<User> getUserById(Integer id);
-    User createUser(User user);
+    List<UserResponseDTO> getAllUsers();
+    UserResponseDTO getUserById(Integer id);
+    UserResponseDTO createUser(UserCreateDTO userCreateDTO);
+    UserResponseDTO getUserByEmail(String email);
+    UserResponseDTO getUserByUsername(String username);
     void deleteUser(Integer id);
 }

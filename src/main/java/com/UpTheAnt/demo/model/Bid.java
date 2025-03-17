@@ -3,9 +3,15 @@ package com.uptheant.demo.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Table(name = "bids") 
+@Table(name = "bids")
+@Getter
+@Setter
+@ToString
 public class Bid {
 
     @Id
@@ -22,56 +28,4 @@ public class Bid {
     @JoinColumn(name = "auction_id", nullable = false)
     private Auction auction;
 
-    // Геттеры и сеттеры
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public void setAuction(Auction auction) {
-        this.auction = auction;
-    }
-
-    public Auction getAuction() {
-        return auction;
-    }
-
-    public Integer getBidId() {
-        return bidId;
-    }
-
-    public void setBidId(Integer bidId) {
-        this.bidId = bidId;
-    }
-
-    public BigDecimal getBidAmount() {
-        return bidAmount;
-    }
-
-    public void setBidAmount(BigDecimal bidAmount) {
-        this.bidAmount = bidAmount;
-    }
-
-    public LocalDateTime getBidTime() {
-        return bidTime;
-    }
-
-    public void setBidTime(LocalDateTime bidTime) {
-        this.bidTime = bidTime;
-    }
-
-    @Override
-    public String toString() {
-    return "Bid{" +
-            "bidId=" + bidId +
-            ", bidAmount=" + bidAmount +
-            ", bidTime=" + bidTime +
-            ", user=" + (user != null ? user.getUserId() : "null") +
-            ", auction=" + (auction != null ? auction.getAuctionId() : "null") +
-            '}';
-    }
 }
