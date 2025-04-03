@@ -3,7 +3,10 @@ package com.uptheant.demo.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -11,6 +14,9 @@ import lombok.ToString;
 @Table(name = "auctions") 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class Auction {
 

@@ -10,4 +10,5 @@ public interface AuctionService {
     AuctionResponseDTO getAuctionById(Integer id);
     AuctionResponseDTO createAuction(AuctionCreateDTO auctionCreateDTO, Integer sellerId);
     void deleteAuction(Integer id);
+    void closeAuction(Integer auctionId);
 }

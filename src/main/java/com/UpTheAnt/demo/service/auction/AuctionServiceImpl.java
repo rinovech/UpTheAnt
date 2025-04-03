@@ -1,84 +1,94 @@
 package com.uptheant.demo.service.auction;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.uptheant.demo.model.User;
 import com.uptheant.demo.dto.auction.AuctionCreateDTO;
 import com.uptheant.demo.dto.auction.AuctionResponseDTO;
+import com.uptheant.demo.exception.BusinessRuleException;
+import com.uptheant.demo.exception.EntityNotFoundException;
 import com.uptheant.demo.model.Auction;
-import com.uptheant.demo.model.User;
 import com.uptheant.demo.repository.AuctionRepository;
 import com.uptheant.demo.repository.UserRepository;
+import com.uptheant.demo.service.mapper.AuctionMapper;
+import com.uptheant.demo.service.validation.AuctionValidator;
+
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
-
-    @Autowired
-    private AuctionRepository auctionRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private final AuctionRepository auctionRepository;
+    private final AuctionValidator auctionValidator;
+    private final AuctionMapper auctionMapper;
+    private final UserRepository userRepository;
 
     @Override
     public List<AuctionResponseDTO> getAllAuctions() {
-        return auctionRepository.findAll()
-                .stream()
-                .map(this::convertToResponseDTO)
-                .collect(Collectors.toList());
+        return auctionRepository.findAll().stream()
+            .map(auctionMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     @Override
     public AuctionResponseDTO getAuctionById(Integer id) {
         return auctionRepository.findById(id)
-                .map(this::convertToResponseDTO)
-                .orElseThrow(() -> new RuntimeException("Auction not found"));
+            .map(auctionMapper::toDto)
+            .orElseThrow(() -> new EntityNotFoundException("Auction not found"));
     }
 
     @Override
-    public AuctionResponseDTO createAuction(AuctionCreateDTO auctionCreateDTO, Integer sellerId) {
-
+    public AuctionResponseDTO createAuction(AuctionCreateDTO dto, Integer sellerId) {
+        auctionValidator.validateCreation(dto);
+        
         User seller = userRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Seller not found"));
 
         Auction auction = new Auction();
-        auction.setName(auctionCreateDTO.getName());
-        auction.setDescription(auctionCreateDTO.getDescription());
-        auction.setStartPrice(auctionCreateDTO.getStartPrice());
-        auction.setMinBidStep(auctionCreateDTO.getMinBidStep());
-        auction.setStartTime(auctionCreateDTO.getStartTime());
-        auction.setEndTime(auctionCreateDTO.getEndTime());
-        auction.setCurrentBid(null);
+        auction.setName(dto.getName());
+        auction.setDescription(dto.getDescription());
+        auction.setStartPrice(dto.getStartPrice());
+        auction.setMinBidStep(dto.getMinBidStep());
+        auction.setStartTime(dto.getStartTime());
+        auction.setEndTime(dto.getEndTime());
         auction.setStatus(false);
         auction.setUser(seller);
-
+        
         Auction savedAuction = auctionRepository.save(auction);
-        return convertToResponseDTO(savedAuction);
+        return auctionMapper.toDto(savedAuction);
     }
 
+    @Override
+    public void closeAuction(Integer auctionId) {
+        Auction auction = auctionRepository.findById(auctionId)
+            .orElseThrow(() -> new EntityNotFoundException("Auction not found"));
+        
+        auctionValidator.validateClosing(auction);
+        
+        auction.setStatus(true);
+        auctionRepository.save(auction);
+    }
+
+    @Transactional
+    @Override
     public void deleteAuction(Integer id) {
+        if (!auctionRepository.existsById(id)) {
+            throw new EntityNotFoundException("Auction with ID " + id + " not found");
+        }
+
+        Auction auction = auctionRepository.findById(id).orElse(null);
+        
+        if (auction != null) {
+            if (auction.getCurrentBid() != null) {
+                throw new BusinessRuleException("Cannot delete auction with existing bids");
+            }
+        }
+
         auctionRepository.deleteById(id);
     }
 
-    private AuctionResponseDTO convertToResponseDTO(Auction auction) {
-        AuctionResponseDTO auctionResponseDTO = new AuctionResponseDTO();
-        auctionResponseDTO.setName(auction.getName());
-        auctionResponseDTO.setDescription(auction.getDescription());
-        auctionResponseDTO.setStartPrice(auction.getStartPrice());
-        auctionResponseDTO.setCurrentBid(auction.getCurrentBid());
-        auctionResponseDTO.setMinBidStep(auction.getMinBidStep());
-        auctionResponseDTO.setStartTime(auction.getStartTime());
-        auctionResponseDTO.setEndTime(auction.getEndTime());
-        auctionResponseDTO.setSellerId(auction.getUser().getUserId());
-
-        if (auction.getUser() != null) {
-            auctionResponseDTO.setSellerId(auction.getUser().getUserId());
-        } else {
-            auctionResponseDTO.setSellerId(null);
-        }
-
-        return auctionResponseDTO;
-    }
 }

@@ -2,15 +2,25 @@ package com.uptheant.demo.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", 
+       indexes = {
+           @Index(name = "idx_user_email", columnList = "email", unique = true),
+           @Index(name = "idx_user_username", columnList = "username", unique = true)
+       })
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class User {
 
