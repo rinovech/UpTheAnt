@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Service
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
@@ -59,14 +58,18 @@ public class BidServiceImpl implements BidService {
                 .orElseThrow(() -> new EntityNotFoundException("Auction not found"));
 
         Bid bid = bidMapper.toEntity(bidCreateDTO);
-            if (bid == null) {
-                throw new IllegalArgumentException("Bid cannot be null");
-            }
+        if (bid == null) {
+            throw new IllegalArgumentException("Bid cannot be null");
+        }
         bid.setUser(user);
         bid.setAuction(auction);
         bid.setBidTime(LocalDateTime.now());
 
         Bid savedBid = bidRepository.save(bid);
+
+        auction.setCurrentBid(savedBid.getBidAmount());
+        auctionRepository.save(auction);
+
         return bidMapper.toDto(savedBid);
     }
 

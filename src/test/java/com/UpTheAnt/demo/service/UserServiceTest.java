@@ -3,11 +3,14 @@ package com.uptheant.demo.service;
 import com.uptheant.demo.dto.user.UserCreateDTO;
 import com.uptheant.demo.dto.user.UserResponseDTO;
 import com.uptheant.demo.dto.user.UserUpdateDTO;
+
 import com.uptheant.demo.exception.EntityNotFoundException;
 import com.uptheant.demo.model.User;
 import com.uptheant.demo.repository.UserRepository;
 import com.uptheant.demo.service.mapper.UserMapper;
 import com.uptheant.demo.service.user.UserServiceImpl;
+import com.uptheant.demo.service.validation.UserValidator;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,11 +31,14 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @InjectMocks
-    private UserServiceImpl userService;
-
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private UserValidator userValidator;
+
+    @InjectMocks
+    private UserServiceImpl userService;
 
     @Test
     void testGetAllUsers() {
@@ -123,9 +129,11 @@ public class UserServiceTest {
         expectedDto.setUsername("veronika");
         expectedDto.setEmail("veronika@example.com");
   
+
+        doNothing().when(userValidator).validateCreation(createDTO);
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(userMapper.toDto(savedUser)).thenReturn(expectedDto);
-   
+
         UserResponseDTO result = userService.createUser(createDTO);
 
         assertNotNull(result);
@@ -133,10 +141,10 @@ public class UserServiceTest {
         assertEquals("veronika", result.getUsername());
         assertEquals("veronika@example.com", result.getEmail());
 
+        verify(userValidator).validateCreation(createDTO);
         verify(userRepository).save(any(User.class));
         verify(userMapper).toDto(savedUser);
     }
-
 
     @Test
     void testDeleteUser() {

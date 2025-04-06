@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UP.THE.ANT - Аукционная платформа</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Manrope, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background-color: #ffffff;
+            padding: 20px 0;
+            position: relative;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .logo .up {
+            color: #d11a59;
+        }
+        
+        .logo .the {
+            color: #000000;
+        }
+        
+        .logo .ant {
+            color: #ffa041;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style-type: none;
+        }
+        
+        nav ul li {
+            margin-right: 30px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: #555;
+            font-size: 14px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #d11a59;
+        }
+        
+        .location {
+            display: flex;
+            align-items: center;
+        }
+        
+        .location-icon {
+            margin-right: 10px;
+            color: #333;
+        }
+        
+        .location-text {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .hero {
+            position: relative;
+            height: 600px;
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('/images/home.png') center/cover no-repeat;
+            overflow: hidden;
+            border-radius: 20px;
+            margin: 20px auto;
+        }
+        
+        .hero-content {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background-color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .hero-caption {
+            color: #777;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 52px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            line-height: 1.1;
+            text-align: center;
+        }
+        
+        .hero-title span {
+            color: #d11a59;
+        }
+        
+        .hero-description {
+            color: #555;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .highlight {
+            font-weight: bold;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: #f8b78b;
+            color: #333;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            transition: background-color 0.3s;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .cta-button:hover {
+            background-color: #f89c41;
+        }
+        
+        .special-offer {
+            position: absolute;
+            left: 200px;
+            bottom: 50px;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            width: 350px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #ffffff;
+        }
+        
+        .special-offer-header {
+            display: flex;align-items: center;
+            margin-bottom: 0px;
+        }
+        
+        .special-offer-icon {
+            background-color: #d11a59;
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20%;
+            margin-right: 15px;
+        }
+        
+        .special-offer-title {
+            text-transform: uppercase;
+            font-size: 12px;
+            font-weight: semibold;
+        }
+        
+        .special-offer-text {
+            font-size: 13px;
+            line-height: 1.2;
+            padding-left: 55px;
+            margin-bottom: 10px;
+        }
+        
+        .ratings {
+            display: flex;
+            align-items: center;
+            margin-top: 25px;
+            justify-content: center;
+        }
+        
+        .avatar-group {
+            display: flex;
+            margin-right: 20px;
+        }
+
+        .avatar1 {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            margin-left: -10px;
+            background-color: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('/images/ava1.jpeg') center/cover no-repeat;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            margin-left: -10px;
+            object-fit: cover; 
+            display: block;
+        }
+
+        .avatar-with-photo1 {
+            background-image: url('/images/ava1.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .avatar-with-photo2 {
+            background-image: url('/images/ava2.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .avatar-with-photo3 {
+            background-image: url('/images/ava3.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .avatar-with-photo4 {
+            background-image: url('/images/ava4.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .avatar:first-child {
+            margin-left: 0;
+        }
+        
+        .stars {
+            color: #f8b78b;
+            margin-right: 10px;
+        }
+        
+        .reviews-count {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="up">UP.</span><span class="the">THE.</span><span class="ant">ANT</span>
+                </div>
+                
+                <nav>
+                    <ul>
+                        <li><a href="#">Активные торги</a></li>
+                        <li><a href="#">Лоты с рубля</a></li>
+                        <li><a href="#">Продать</a></li>
+                        <li><a href="#">Доставка</a></li>
+                        <li><a href="#">Личный кабинет</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="location">
+                    <div class="location-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                        </svg>
+                    </div>
+                    <div class="location-text">
+                        <span>САРАТОВ, <br>ВОЛЬСКАЯ, 10А</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <div class="container">
+            <div class="hero">
+                <div class="hero-content">
+                    <div class="hero-caption">ТОРГУЙСЯ. ПОБЕЖДАЙ. ЗАБИРАЙ</div>
+                    <h1 class="hero-title">ТВОЙ <span>ВЫИГРЫШ</span><br>НАЧИНАЕТСЯ ТУТ</h1>
+                    <p class="hero-description">
+                        Уникальные лоты и выгодные сделки — только на нашем сайте. Редкие коллекции, техника, антиквариат и многое другое ждут своих новых владельцев. Делай ставки и забирай желаемое <span class="highlight">дешевле</span>, чем где-либо!
+                    </p>
+                    <a href="#" class="cta-button">ВЫБРАТЬ ЛОТ</a>
+                    
+                    <div class="ratings">
+                        <div class="avatar-group">
+                            <div class="avatar avatar-with-photo1"></div>
+                            <div class="avatar avatar-with-photo3"></div>
+                            <div class="avatar avatar-with-photo2"></div>
+                            <div class="avatar avatar-with-photo4"></div>
+                        </div>
+                        <div class="stars">
+                            ★★★★★
+                        </div>
+                        <div class="reviews-count">
+                            175+ отзывов!
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="special-offer">
+                    <div class="special-offer-header">
+                    <div class="special-offer-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                        </svg>
+                    </div>
+                    <div class="special-offer-title">Специальное предложение</div>
+                </div>
+                <div class="special-offer-text">
+                    Скидка 30% на первую доставку при регистрации до 31 апреля
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

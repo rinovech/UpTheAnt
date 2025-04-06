@@ -1,8 +1,5 @@
 package com.uptheant.demo.service.auction;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.uptheant.demo.model.User;
 import com.uptheant.demo.dto.auction.AuctionCreateDTO;
 import com.uptheant.demo.dto.auction.AuctionResponseDTO;
@@ -13,15 +10,21 @@ import com.uptheant.demo.repository.AuctionRepository;
 import com.uptheant.demo.repository.UserRepository;
 import com.uptheant.demo.service.mapper.AuctionMapper;
 import com.uptheant.demo.service.validation.AuctionValidator;
-
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
+    private static final Logger logger = LoggerFactory.getLogger(AuctionServiceImpl.class);
+
     private final AuctionRepository auctionRepository;
     private final AuctionValidator auctionValidator;
     private final AuctionMapper auctionMapper;
@@ -30,23 +33,24 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     public List<AuctionResponseDTO> getAllAuctions() {
         return auctionRepository.findAll().stream()
-            .map(auctionMapper::toDto)
-            .collect(Collectors.toList());
+                .map(auctionMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public AuctionResponseDTO getAuctionById(Integer id) {
         return auctionRepository.findById(id)
-            .map(auctionMapper::toDto)
-            .orElseThrow(() -> new EntityNotFoundException("Auction not found"));
+                .map(auctionMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Auction not found"));
     }
 
     @Override
     public AuctionResponseDTO createAuction(AuctionCreateDTO dto, Integer sellerId) {
+
         auctionValidator.validateCreation(dto);
-        
+
         User seller = userRepository.findById(sellerId)
-            .orElseThrow(() -> new EntityNotFoundException("Seller not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Seller not found"));
 
         Auction auction = new Auction();
         auction.setName(dto.getName());
@@ -55,40 +59,63 @@ public class AuctionServiceImpl implements AuctionService {
         auction.setMinBidStep(dto.getMinBidStep());
         auction.setStartTime(dto.getStartTime());
         auction.setEndTime(dto.getEndTime());
+
         auction.setStatus(false);
         auction.setUser(seller);
-        
+
         Auction savedAuction = auctionRepository.save(auction);
+        
+        logger.info("Auction created: ID {}, Name: {}", savedAuction.getAuctionId(), savedAuction.getName());
+        
         return auctionMapper.toDto(savedAuction);
     }
 
     @Override
+    @Transactional
     public void closeAuction(Integer auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
-            .orElseThrow(() -> new EntityNotFoundException("Auction not found"));
-        
+                .orElseThrow(() -> new EntityNotFoundException("Auction not found"));
+
         auctionValidator.validateClosing(auction);
-        
-        auction.setStatus(true);
+    
+        if (auction.getEndTime() == null) {
+            throw new BusinessRuleException("Auction end time is not set");
+        }
+    
+        LocalDateTime now = LocalDateTime.now();
+        if (auction.getEndTime().isAfter(now)) {
+            logger.info("Auction end time not reached: ID {}", auctionId);
+            return;
+        }
+    
+        if (!auction.isStatus()) {
+            logger.info("Auction already closed: ID {}", auctionId);
+            return;
+        }
+    
+        auction.setStatus(false);
         auctionRepository.save(auction);
+        
+        logger.info("Auction {} closed {}", auction.getAuctionId(), 
+            auction.getCurrentBid() != null ? "with winner" : "without bids");
     }
 
     @Transactional
     @Override
     public void deleteAuction(Integer id) {
-        if (!auctionRepository.existsById(id)) {
+
+        if(!auctionRepository.existsById(id)) {
             throw new EntityNotFoundException("Auction with ID " + id + " not found");
         }
 
         Auction auction = auctionRepository.findById(id).orElse(null);
-        
-        if (auction != null) {
-            if (auction.getCurrentBid() != null) {
-                throw new BusinessRuleException("Cannot delete auction with existing bids");
-            }
+
+        if (auction != null && auction.getCurrentBid() != null) {
+            throw new BusinessRuleException("Cannot delete auction with existing bids");
         }
 
         auctionRepository.deleteById(id);
+        
+        logger.info("Auction deleted: ID {}", id);
     }
-
 }

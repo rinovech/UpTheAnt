@@ -3,6 +3,7 @@ package com.uptheant.demo.service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +21,7 @@ import com.uptheant.demo.service.mapper.AuctionMapper;
 import com.uptheant.demo.service.validation.AuctionValidator;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -127,13 +129,43 @@ public class AuctionServiceTest {
     void testCloseAuction() {
 
         Auction auction = new Auction();
+        auction.setEndTime(LocalDateTime.now().minusHours(1)); 
+        auction.setStatus(true);
+        
         when(auctionRepository.findById(1)).thenReturn(Optional.of(auction));
 
         auctionService.closeAuction(1);
 
-        assertTrue(auction.isStatus());
-        verify(auctionValidator).validateClosing(auction);
-        verify(auctionRepository, times(1)).save(auction);
+        assertFalse(auction.isStatus());
+        verify(auctionValidator).validateClosing(auction); 
+        verify(auctionRepository).save(auction);
+    }
+
+    @Test
+    void testCloseAuction_validatorCalledFirst() {
+        Auction auction = new Auction();
+        auction.setEndTime(LocalDateTime.now().minusHours(1));
+        auction.setStatus(true);
+        
+        when(auctionRepository.findById(1)).thenReturn(Optional.of(auction));
+
+        auctionService.closeAuction(1);
+        
+        InOrder inOrder = inOrder(auctionValidator, auctionRepository);
+        inOrder.verify(auctionValidator).validateClosing(auction);
+        inOrder.verify(auctionRepository).save(auction);
+    }
+
+    @Test
+    void testCloseAuction_throwsWhenInvalid() {
+        Auction auction = new Auction();
+        auction.setEndTime(null);
+        
+        when(auctionRepository.findById(1)).thenReturn(Optional.of(auction));
+        doThrow(new BusinessRuleException("Invalid auction"))
+            .when(auctionValidator).validateClosing(auction);
+        
+        assertThrows(BusinessRuleException.class, () -> auctionService.closeAuction(1));
     }
 
     @Test

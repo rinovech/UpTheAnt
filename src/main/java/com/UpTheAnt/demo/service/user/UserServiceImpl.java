@@ -7,6 +7,7 @@ import com.uptheant.demo.exception.EntityNotFoundException;
 import com.uptheant.demo.model.User;
 import com.uptheant.demo.repository.UserRepository;
 import com.uptheant.demo.service.mapper.UserMapper;
+import com.uptheant.demo.service.validation.UserValidator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,8 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper; 
+    private final UserMapper userMapper;
+    private final UserValidator userValidator; 
 
     @Override
     @Transactional(readOnly = true)
@@ -42,6 +44,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDTO createUser(UserCreateDTO userCreateDTO) {
+        userValidator.validateCreation(userCreateDTO);
         User user = new User();
         user.setName(userCreateDTO.getName().trim());
         user.setUsername(userCreateDTO.getUsername().trim());

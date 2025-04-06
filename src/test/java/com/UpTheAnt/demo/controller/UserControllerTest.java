@@ -14,6 +14,7 @@ import com.uptheant.demo.repository.UserRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -31,7 +32,7 @@ public class UserControllerTest {
     @AfterEach
     public void resetDb() {
         userRepository.deleteAll(); 
-}
+    }
 
     @Test
     public void givenUser_whenAdd_thenStatus201andUserReturned() throws Exception {
@@ -39,17 +40,17 @@ public class UserControllerTest {
         userCreateDTO.setName("Veronika");
         userCreateDTO.setUsername("veronika123");
         userCreateDTO.setEmail("veronika@example.com");
-        userCreateDTO.setPassword("password123");
+        userCreateDTO.setPassword("Password123!");
 
         mockMvc.perform(
                 post("/users")
-                        .content(objectMapper.writeValueAsString(userCreateDTO))
-                        .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(userCreateDTO))
+                    .contentType(MediaType.APPLICATION_JSON)
         )
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Veronika"))
-                .andExpect(jsonPath("$.username").value("veronika123"))
-                .andExpect(jsonPath("$.email").value("veronika@example.com"));
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.name").value("Veronika"))
+        .andExpect(jsonPath("$.username").value("veronika123"))
+        .andExpect(jsonPath("$.email").value("veronika@example.com"));
     }
 
     @Test
@@ -58,7 +59,7 @@ public class UserControllerTest {
         user.setName("Veronika");
         user.setUsername("veronika123");
         user.setEmail("veronika@example.com");
-        user.setPassword("password123");
+        user.setPassword("Password123!");
 
         User savedUser = userRepository.save(user);
 
@@ -83,26 +84,26 @@ public class UserControllerTest {
         user1.setName("Veronika");
         user1.setUsername("veronika123");
         user1.setEmail("veronika@example.com");
-        user1.setPassword("password123");
+        user1.setPassword("Password123!");
 
         User user2 = new User();
         user2.setName("Ivan");
         user2.setUsername("ivan123");
         user2.setEmail("ivan@example.com");
-        user2.setPassword("password123");
+        user2.setPassword("Password123!");
 
         userRepository.save(user1);
         userRepository.save(user2);
 
-        mockMvc.perform(
-                get("/users"))
+        mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Veronika"))
-                .andExpect(jsonPath("$[0].username").value("veronika123"))
-                .andExpect(jsonPath("$[0].email").value("veronika@example.com"))
-                .andExpect(jsonPath("$[1].name").value("Ivan"))
-                .andExpect(jsonPath("$[1].username").value("ivan123"))
-                .andExpect(jsonPath("$[1].email").value("ivan@example.com"));
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name", is("Veronika")))
+                .andExpect(jsonPath("$[0].username", is("veronika123")))
+                .andExpect(jsonPath("$[0].email", is("veronika@example.com")))
+                .andExpect(jsonPath("$[1].name", is("Ivan")))
+                .andExpect(jsonPath("$[1].username", is("ivan123")))
+                .andExpect(jsonPath("$[1].email", is("ivan@example.com")));
     }
 
     @Test
@@ -111,14 +112,14 @@ public class UserControllerTest {
         user.setName("Veronika");
         user.setUsername("veronika123");
         user.setEmail("veronika@example.com");
-        user.setPassword("password123");
+        user.setPassword("Password123!");
 
         User savedUser = userRepository.save(user);
 
         mockMvc.perform(
                 delete("/users/{id}", savedUser.getUserId()))
                 .andExpect(status().isOk())
-                .andExpect(content().string("User with ID " + savedUser.getUserId() + " was successfully deleted."));
+                .andExpect(content().string(containsString("User with ID " + savedUser.getUserId() + " was deleted")));
     }
 
     @Test
@@ -131,16 +132,35 @@ public class UserControllerTest {
     @Test
     public void givenInvalidUser_whenAdd_thenStatus400() throws Exception {
         UserCreateDTO userCreateDTO = new UserCreateDTO();
-        userCreateDTO.setName(null); 
-        userCreateDTO.setUsername(null); 
-        userCreateDTO.setEmail(null); 
-        userCreateDTO.setPassword(null); 
-    
+        
         mockMvc.perform(
                 post("/users")
-                        .content(objectMapper.writeValueAsString(userCreateDTO))
-                        .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(userCreateDTO))
+                    .contentType(MediaType.APPLICATION_JSON)
         )
-                .andExpect(status().isBadRequest()); 
+        .andExpect(status().isBadRequest()); 
+    }
+
+    @Test
+    public void givenUserByUsername_whenExists_thenStatus200andUserReturned() throws Exception {
+        User user = new User();
+        user.setName("Veronika");
+        user.setUsername("veronika123");
+        user.setEmail("veronika@example.com");
+        user.setPassword("Password123!");
+
+        userRepository.save(user);
+
+        mockMvc.perform(
+                get("/users/by-username/{username}", "veronika123"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("veronika123"));
+    }
+
+    @Test
+    public void givenUserByUsername_whenNotExists_thenStatus404() throws Exception {
+        mockMvc.perform(
+                get("/users/by-username/{username}", "nonexistent"))
+                .andExpect(status().isNotFound());
     }
 }

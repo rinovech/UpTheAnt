@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/system")  // Теперь точно будет работать
+@RequestMapping("/system")
 @Tag(name = "System API", description = "Операции для работы с системой")
 public class SystemController {
 

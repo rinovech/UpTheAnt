@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.uptheant.demo.service.user.UserService;
+import com.uptheant.demo.exception.BusinessRuleException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,136 +31,100 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Operation(
-        summary = "Получить всех пользователей",
-        description = "Возвращает список всех зарегистрированных пользователей"
-    )
-    @ApiResponse(
-        responseCode = "200",
-        description = "Успешное получение списка пользователей",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = UserResponseDTO.class),
-            examples = @ExampleObject(value = "[{\"name\":\"Veronika\",\"username\":\"veronika\",\"email\":\"veronika@example.com\"}]")
-        )
-    )
+    @Operation(summary = "Получить всех пользователей")
+    @ApiResponse(responseCode = "200", description = "Успешное получение списка пользователей")
     @GetMapping
     public List<UserResponseDTO> getAllUsers() {
         return userService.getAllUsers();
     }
     
-    @Operation(
-        summary = "Получить пользователя по ID",
-        description = "Возвращает подробную информацию о пользователе по его идентификатору"
-    )
+    @Operation(summary = "Получить пользователя по ID")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "Пользователь найден",
-            content = @Content(
-                schema = @Schema(implementation = UserResponseDTO.class),
-                examples = @ExampleObject(value = "[{\"name\":\"Veronika\",\"username\":\"veronika\",\"email\":\"veronika@example.com\"}]")
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Пользователь не найден",
-            content = @Content(examples = @ExampleObject(value = "{}")))
+        @ApiResponse(responseCode = "200", description = "Пользователь найден"),
+        @ApiResponse(responseCode = "404", description = "Пользователь не найден")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(
-        @Parameter(description = "ID пользователя", example = "1")
-        @PathVariable Integer id) {
+    public ResponseEntity<?> getUserById(
+        @Parameter(description = "ID пользователя", example = "1") @PathVariable Integer id) {
         try {
             UserResponseDTO user = userService.getUserById(id);
             return ResponseEntity.ok(user);
         } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.notFound().build();
         }
     }
 
-    @Operation(
-        summary = "Создать нового пользователя",
-        description = "Регистрирует нового пользователя в системе"
-    )
+    @Operation(summary = "Создать нового пользователя")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "201",
-            description = "Пользователь успешно создан",
-            content = @Content(
-                schema = @Schema(implementation = UserResponseDTO.class),
-                examples = @ExampleObject(value = "[{\"name\":\"Veronika\",\"username\":\"veronika\",\"email\":\"veronika@example.com\"}]")
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Невалидные данные пользователя",
-            content = @Content(examples = @ExampleObject(value = "{\"error\":\"Invalid email format\"}")))
+        @ApiResponse(responseCode = "201", description = "Пользователь создан"),
+        @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+        @ApiResponse(responseCode = "409", description = "Конфликт данных")
     })
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDTO createUser(
+    public ResponseEntity<?> createUser(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Данные для создания пользователя",
             required = true,
             content = @Content(
                 schema = @Schema(implementation = UserCreateDTO.class),
-                examples = @ExampleObject(value = "[{\"name\":\"Veronika\",\"username\":\"veronika\",\"email\":\"veronika@example.com\",\"password\":\"password\"}")
+                examples = @ExampleObject(
+                        name = "Пример запроса",
+                        value = """
+                        {
+                            "name": "Veronika",
+                            "username": "veronika",
+                            "email": "veronika@example.com",
+                            "password": "Password1!"
+                        }
+                        """
+                    )
             )
         )
         @Valid @RequestBody UserCreateDTO userCreateDTO) {
-        return userService.createUser(userCreateDTO);
-    }
-
-    @Operation(
-        summary = "Удалить пользователя",
-        description = "Удаляет пользователя по его идентификатору"
-    )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "Пользователь успешно удален",
-            content = @Content(examples = @ExampleObject(value = "\"User with ID 1 was successfully deleted.\""))
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Пользователь не найден",
-            content = @Content(examples = @ExampleObject(value = "\"User not found with ID: 1\"")))
-    })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(
-        @Parameter(description = "ID пользователя для удаления", example = "1")
-        @PathVariable Integer id) {
         try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok("User with ID " + id + " was successfully deleted.");
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+            UserResponseDTO createdUser = userService.createUser(userCreateDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } catch (BusinessRuleException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         }
     }
 
-    @Operation(
-        summary = "Найти пользователя по имени",
-        description = "Возвращает пользователя по его username"
-    )
+    @Operation(summary = "Удалить пользователя")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "Пользователь найден",
-            content = @Content(
-                schema = @Schema(implementation = UserResponseDTO.class),
-                examples = @ExampleObject(value = "[{\"name\":\"Veronika\",\"username\":\"veronika\",\"email\":\"veronika@example.com\"}]")
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Пользователь не найден",
-            content = @Content(examples = @ExampleObject(value = "{}")))
+        @ApiResponse(responseCode = "200", description = "Пользователь удален"),
+        @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
+        @ApiResponse(responseCode = "400", description = "Некорректный запрос")
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(
+        @Parameter(description = "ID пользователя", example = "1") @PathVariable Integer id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok("User with ID " + id + " was deleted");
+        } catch (BusinessRuleException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Найти пользователя по имени")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Пользователь найден"),
+        @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
+        @ApiResponse(responseCode = "400", description = "Некорректный запрос")
     })
     @GetMapping("/by-username/{username}")
-    public ResponseEntity<UserResponseDTO> getUserByUsername(
-        @Parameter(description = "Username пользователя", example = "veronika")
+    public ResponseEntity<?> getUserByUsername(
+        @Parameter(description = "Username пользователя", example = "veronika") 
         @PathVariable String username) {
-        return ResponseEntity.ok(userService.getUserByUsername(username));
+        try {
+            UserResponseDTO user = userService.getUserByUsername(username);
+            return ResponseEntity.ok(user);
+        } catch (BusinessRuleException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

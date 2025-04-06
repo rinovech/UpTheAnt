@@ -16,6 +16,10 @@ public class UserValidator {
 
     public void validateCreation(UserCreateDTO dto) {
 
+        if (dto == null) {
+            throw new BusinessRuleException("User data cannot be null");
+        }
+
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new BusinessRuleException("Email already registered");
         }
@@ -52,10 +56,10 @@ public class UserValidator {
             throw new BusinessRuleException("Password must contain lowercase letter");
         }
         if (!password.matches(".*\\d.*")) {
-            throw new BusinessRuleException("Password must contain digit");
+            throw new BusinessRuleException("Password must contain digit 0-9");
         }
         if (!password.matches(".*[!@#$%^&*()].*")) {
-            throw new BusinessRuleException("Password must contain special character");
+            throw new BusinessRuleException("Password must contain special character: !@#$%^&*()");
         }
     }
 }

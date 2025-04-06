@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -40,19 +41,7 @@ public class BidController {
     )
     @ApiResponse(
         responseCode = "200",
-        description = "Список ставок успешно получен",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = BidResponseDTO.class, type = "array"),
-            examples = @ExampleObject(value = """
-                [{
-                  "bidAmount": 1500.00,
-                  "bidTime": "2025-04-03T23:59:59",
-                  "userId": 1,
-                  "auctionId": 1
-                }]
-                """)
-        )
+        description = "Список ставок успешно получен"
     )
     @GetMapping
     public List<BidResponseDTO> getAllBids() {
@@ -66,32 +55,23 @@ public class BidController {
     @ApiResponses({
         @ApiResponse(
             responseCode = "200",
-            description = "Ставка найдена",
-            content = @Content(
-                schema = @Schema(implementation = BidResponseDTO.class),
-                examples = @ExampleObject(value = """
-                    {
-                      "bidAmount": 1500.00,
-                      "bidTime": "2025-04-03T23:59:59",
-                      "userId": 1,
-                      "auctionId": 1
-                    }
-                    """)
-            )
+            description = "Ставка найдена"
         ),
         @ApiResponse(
             responseCode = "404",
-            description = "Ставка не найдена",
-            content = @Content(examples = @ExampleObject(value = "{}"))
-        )
+            description = "Ставка не найдена"
+        ),
+        @ApiResponse(responseCode = "400", description = "Некорректный запрос")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<BidResponseDTO> getBidById(
+    public ResponseEntity<?> getBidById(
         @Parameter(description = "ID ставки", example = "1")
         @PathVariable Integer id) {
         try {
             BidResponseDTO bid = bidService.getBidById(id);
             return ResponseEntity.ok(bid);
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -104,41 +84,20 @@ public class BidController {
     @ApiResponses({
         @ApiResponse(
             responseCode = "201",
-            description = "Ставка успешно создана",
-            content = @Content(
-                schema = @Schema(implementation = BidResponseDTO.class),
-                examples = @ExampleObject(value = """
-                    {
-                      "bidAmount": 1500.00,
-                      "bidTime": "2025-04-03T23:59:59",
-                      "userId": 1,
-                      "auctionId": 1
-                    }
-                    """)
-            )
+            description = "Ставка успешно создана"
         ),
         @ApiResponse(
             responseCode = "400",
-            description = "Невалидные данные ставки",
-            content = @Content(examples = @ExampleObject(value = """
-                {
-                  "error": "Bid amount must be higher than current price"
-                }
-                """))
+            description = "Невалидные данные ставки"
         ),
         @ApiResponse(
             responseCode = "404",
-            description = "Аукцион или пользователь не найдены",
-            content = @Content(examples = @ExampleObject(value = """
-                {
-                  "error": "Auction not found"
-                }
-                """))
+            description = "Аукцион или пользователь не найдены"
         )
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BidResponseDTO createBid(
+    public ResponseEntity<?> createBid(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Данные для создания ставки",
             required = true,
@@ -151,12 +110,19 @@ public class BidController {
                     """)
             )
         )
-        @RequestBody BidCreateDTO bidCreateDTO,
+        @Valid @RequestBody BidCreateDTO bidCreateDTO,
         @Parameter(description = "ID пользователя", example = "1", required = true)
         @RequestParam Integer userId,
         @Parameter(description = "ID аукциона", example = "1", required = true)
         @RequestParam Integer auctionId) {
-        return bidService.createBid(bidCreateDTO, userId, auctionId);
+        try {
+            BidResponseDTO createdBid = bidService.createBid(bidCreateDTO, userId, auctionId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdBid);
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (BusinessRuleException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+        }
     }
 
     @Operation(
@@ -166,18 +132,13 @@ public class BidController {
     @ApiResponses({
         @ApiResponse(
             responseCode = "200",
-            description = "Ставка успешно удалена",
-            content = @Content(examples = @ExampleObject(value = """
-                "Bid with ID 1 was successfully deleted."
-                """))
+            description = "Ставка успешно удалена"
         ),
         @ApiResponse(
             responseCode = "404",
-            description = "Ставка не найдена",
-            content = @Content(examples = @ExampleObject(value = """
-                "Bid not found with ID: 1"
-                """))
-        )
+            description = "Ставка не найдена"
+        ),
+        @ApiResponse(responseCode = "400", description = "Некорректный запрос")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBid(
