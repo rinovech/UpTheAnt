@@ -9,5 +9,15 @@ public class MainController {
     public String home() {
         return "index"; 
     }
+
+    @GetMapping("/register")
+    public String showRegisterForm() {
+        return "signup";
+    }
+
+    @GetMapping("/login")
+    public String showLogForm() {
+        return "login";
+    }
 } 
     

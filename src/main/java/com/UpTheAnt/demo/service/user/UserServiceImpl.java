@@ -5,11 +5,14 @@ import com.uptheant.demo.dto.user.UserResponseDTO;
 import com.uptheant.demo.dto.user.UserUpdateDTO;
 import com.uptheant.demo.exception.EntityNotFoundException;
 import com.uptheant.demo.model.User;
+import com.uptheant.demo.model.UserRole;
 import com.uptheant.demo.repository.UserRepository;
 import com.uptheant.demo.service.mapper.UserMapper;
 import com.uptheant.demo.service.validation.UserValidator;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final UserValidator userValidator; 
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -32,6 +36,7 @@ public class UserServiceImpl implements UserService {
                 .map(this::convertToDto)
                 .toList();
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -49,7 +54,8 @@ public class UserServiceImpl implements UserService {
         user.setName(userCreateDTO.getName().trim());
         user.setUsername(userCreateDTO.getUsername().trim());
         user.setEmail(userCreateDTO.getEmail().trim().toLowerCase());
-        user.setPassword(userCreateDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userCreateDTO.getPassword()));
+        user.setRole(UserRole.USER);
 
         User savedUser = userRepository.save(user);
         return userMapper.toDto(savedUser);

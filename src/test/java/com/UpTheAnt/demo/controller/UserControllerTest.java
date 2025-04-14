@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uptheant.demo.DemoApplicationTests;
 import com.uptheant.demo.dto.user.UserCreateDTO;
 import com.uptheant.demo.model.User;
 import com.uptheant.demo.repository.UserRepository;
@@ -18,7 +19,7 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class UserControllerTest {
+public class UserControllerTest extends DemoApplicationTests{
 
     @Autowired
     private ObjectMapper objectMapper;

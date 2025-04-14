@@ -1,5 +1,6 @@
 package com.uptheant.demo.validation;
 
+import com.uptheant.demo.DemoApplicationTests;
 import com.uptheant.demo.controller.AuctionController;
 import com.uptheant.demo.dto.auction.AuctionCreateDTO;
 import com.uptheant.demo.model.User;
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class AuctionValidationTest {
+public class AuctionValidationTest extends DemoApplicationTests {
 
     @Autowired
     private AuctionController auctionController;

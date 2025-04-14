@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog 
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    
+    <changeSet id="1" author="admin">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bids"/>
+                <tableExists tableName="users"/>
+                <tableExists tableName="auctions"/>
+            </not>
+        </preConditions>
+        <!-- Создание таблицы users -->
+        <createTable tableName="users">
+            <column name="user_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Создание таблицы auctions -->
+        <createTable tableName="auctions">
+            <column name="auction_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="start_price" type="NUMERIC(38,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="min_bid_step" type="NUMERIC(38,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="INTEGER">
+                <constraints nullable="true"/>
+            </column>
+            <column name="current_bid" type="NUMERIC(38,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" type="BOOLEAN">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <!-- Создание таблицы bids -->
+        <createTable tableName="bids">
+            <column name="bid_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="INTEGER">
+                <constraints nullable="true"/>
+            </column>
+            <column name="auction_id" type="INTEGER">
+                <constraints nullable="true"/>
+            </column>
+            <column name="bid_amount" type="NUMERIC(38,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bid_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Внешние ключи -->
+        <addForeignKeyConstraint 
+            baseTableName="auctions"
+            baseColumnNames="user_id"
+            constraintName="fk_auction_user"
+            referencedTableName="users"
+            referencedColumnNames="user_id"/>
+        
+        <addForeignKeyConstraint 
+            baseTableName="bids"
+            baseColumnNames="user_id"
+            constraintName="fk_bid_user"
+            referencedTableName="users"
+            referencedColumnNames="user_id"/>
+        
+        <addForeignKeyConstraint 
+            baseTableName="bids"
+            baseColumnNames="auction_id"
+            constraintName="fk_bid_auction"
+            referencedTableName="auctions"
+            referencedColumnNames="auction_id"/>
+    </changeSet>
+</databaseChangeLog>
