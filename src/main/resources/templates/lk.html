@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Личный кабинет</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Manrope, sans-serif;
+        }
+        body {
+            margin: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background: #555;
+            color: white;
+            padding: 20px 0;
+        }
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgb(162, 162, 162)
+        }
+        .sidebar-nav {
+            padding: 20px;
+        }
+        .sidebar-nav a {
+            display: block;
+            color: #ecf0f1;
+            padding: 10px 0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .sidebar-nav a:hover {
+            color: #d11a59;
+        }
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #d11a59;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .logout-btn {
+            background: #f8b78b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .logout-btn:hover{
+            background: #f89c41;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Меню</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/" class="active">Главная</a>
+                <a href="#">Мои аукционы</a>
+                <a href="#">Мои ставки</a>
+                <a href="#">Настройки</a>
+                <a href="#">Помощь</a>
+            </nav>
+        </div>
+
+
+        <div class="main-content">
+            <div class="header">
+                <h1>Личный кабинет</h1>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">В</div>
+                    <button class="logout-btn" onclick="logout()">Выйти</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Добро пожаловать, <span id="username">Вероника</span>!</h2>
+                <p>Ваш email: <span id="userEmail">veronika@example.com</span></p>
+            </div>
+
+            <div class="card">
+                <h3>Последние активности</h3>
+                <ul id="activities">
+                    <li>Вы сделали ставку на аукцион "Картина" - 15.04.2025</li>
+                    <li>Ваш аукцион "Пластинка" завершен - 14.04.2025</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const userData = {
+                name: "Вероника",
+                email: "veronika@example.com",
+                initials: "В"
+            };
+
+            document.getElementById('username').textContent = userData.name;
+            document.getElementById('userEmail').textContent = userData.email;
+            document.getElementById('userAvatar').textContent = userData.initials;
+        });
+
+        function logout() {
+
+            console.log('Выход из системы');
+            window.location.href = '/login.html'; 
+        }
+    </script>
+</body>
+</html>

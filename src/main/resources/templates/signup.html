@@ -8,7 +8,6 @@
     <style>
         body {
             font-family: Manrope, sans-serif;
-            line-height: 1.6;
             margin: 0;
             padding: 100px;
             justify-content: center;
@@ -33,7 +32,7 @@
         label {
             display: block;
             margin-bottom: 5px;
-            font-weight: bold;
+            color: #555;
         }
         input[type="text"],
         input[type="text"],
@@ -46,7 +45,7 @@
             box-sizing: border-box;
         }
         button {
-            background-color: #4CAF50;
+            background-color: #555;
             color: white;
             padding: 12px 20px;
             border: none;
@@ -56,14 +55,14 @@
             font-size: 16px;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #383838;
         }
         .login-link {
             text-align: center;
             margin-top: 15px;
         }
         .login-link a {
-            color: #1976d2;
+            color: #d11a59;
             text-decoration: none;
         }
         .login-link a:hover {
@@ -75,7 +74,7 @@
     <div class="container">
         <h1>Регистрация</h1>
         
-        <form action="/auth/signup" method="POST">
+        <form action="/view/auth/signup" method="POST">
             <div class="form-group">
                 <label for="name">Полное имя:</label>
                 <input type="text" id="name" name="name" required>
@@ -102,7 +101,7 @@
         </form>
         
         <div class="login-link">
-            Уже есть аккаунт? <a href="/login">Войти</a>
+            Уже есть аккаунт? <a href="/view/auth/login">Войти</a>
         </div>
     </div>
 </body>

@@ -48,7 +48,7 @@
         button {
             width: 100%;
             padding: 0.75rem;
-            background-color: #4CAF50;
+            background-color: #555;
             color: white;
             border: none;
             border-radius: 4px;
@@ -57,7 +57,7 @@
             margin-top: 1rem;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #383838;
         }
         .error-message {
             color: #d32f2f;
@@ -69,7 +69,7 @@
             margin-top: 1.5rem;
         }
         .register-link a {
-            color: #1976d2;
+            color: #d11a59;
             text-decoration: none;
         }
         .register-link a:hover {
@@ -81,7 +81,7 @@
     <div class="login-container">
         <h1>Вход в систему</h1>
         
-        <form action="/auth/signin" method="POST">
+        <form action="/view/auth/signin" method="POST" enctype="application/json">
             <input type="hidden" name="_csrf" value="${_csrf.token}" />
             
             <div class="form-group">
@@ -99,7 +99,7 @@
         </form>
         
         <div class="register-link">
-            Нет аккаунта? <a href="/register">Зарегистрируйтесь</a>
+            Нет аккаунта? <a href="/view/auth/register">Зарегистрируйтесь</a>
         </div>
     </div>
 </body>

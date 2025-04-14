@@ -13,9 +13,11 @@ import com.uptheant.demo.service.validation.UserValidator;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +41,9 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Test
     void testGetAllUsers() {
@@ -108,43 +113,44 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findByUsername("veronika");
     }
 
-    @Test
-    void testCreateUser() {
+ @Test
+void testCreateUser() {
 
-        UserCreateDTO createDTO = new UserCreateDTO();
-        createDTO.setName("Veronika");
-        createDTO.setUsername("veronika");
-        createDTO.setEmail("veronika@example.com");
-        createDTO.setPassword("password123");
+    UserCreateDTO createDTO = new UserCreateDTO();
+    createDTO.setName("Veronika");
+    createDTO.setUsername("veronika");
+    createDTO.setEmail("veronika@example.com");
+    createDTO.setPassword("password123");
 
-        User savedUser = new User();
-        savedUser.setUserId(1);
-        savedUser.setName("Veronika");
-        savedUser.setUsername("veronika");
-        savedUser.setEmail("veronika@example.com");
-        savedUser.setPassword("password123");
-    
-        UserResponseDTO expectedDto = new UserResponseDTO();
-        expectedDto.setName("Veronika");
-        expectedDto.setUsername("veronika");
-        expectedDto.setEmail("veronika@example.com");
-  
+    User savedUser = new User();
+    savedUser.setUserId(1);
+    savedUser.setName("Veronika");
+    savedUser.setUsername("veronika");
+    savedUser.setEmail("veronika@example.com");
+    savedUser.setPassword(passwordEncoder.encode("password123")); 
 
-        doNothing().when(userValidator).validateCreation(createDTO);
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-        when(userMapper.toDto(savedUser)).thenReturn(expectedDto);
+    UserResponseDTO expectedDto = new UserResponseDTO();
+    expectedDto.setName("Veronika");
+    expectedDto.setUsername("veronika");
+    expectedDto.setEmail("veronika@example.com");
 
-        UserResponseDTO result = userService.createUser(createDTO);
+    doNothing().when(userValidator).validateCreation(createDTO);
+    when(userRepository.save(any(User.class))).thenReturn(savedUser);
+    when(userMapper.toDto(savedUser)).thenReturn(expectedDto);
 
-        assertNotNull(result);
-        assertEquals("Veronika", result.getName());
-        assertEquals("veronika", result.getUsername());
-        assertEquals("veronika@example.com", result.getEmail());
+    UserResponseDTO result = userService.createUser(createDTO);
 
-        verify(userValidator).validateCreation(createDTO);
-        verify(userRepository).save(any(User.class));
-        verify(userMapper).toDto(savedUser);
-    }
+    assertNotNull(result);
+    assertEquals("Veronika", result.getName());
+    assertEquals("veronika", result.getUsername());
+    assertEquals("veronika@example.com", result.getEmail());
+
+    ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+    verify(userRepository).save(userCaptor.capture());
+
+    verify(userValidator).validateCreation(createDTO);
+    verify(userMapper).toDto(savedUser);
+}
 
     @Test
     void testDeleteUser() {

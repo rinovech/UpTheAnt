@@ -1,6 +1,5 @@
 package com.uptheant.demo.config;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -43,25 +42,31 @@ public class SecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/auth/signin", "/auth/signup", "/auth/signout", "/register").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                .requestMatchers("/", "/error", "/csrf").permitAll()
+                .requestMatchers(
+                    "/auth/**",
+                    "/view/auth/**",
+                    "/static/**",
+                    "/static/images/**",
+                    "/css/**",
+                    "/js/**",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/",
+                    "/error",
+                    "/csrf",
+                    "/lk"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login")
+                .loginPage("/view/auth/login")
+                .defaultSuccessUrl("/lk")
+                .failureUrl("/view/auth/login?error")
                 .permitAll()
-            )
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) -> {
-                    log.error("Unauthorized access: {}", authException.getMessage());
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                })
             )
             .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
             .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(loggingFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

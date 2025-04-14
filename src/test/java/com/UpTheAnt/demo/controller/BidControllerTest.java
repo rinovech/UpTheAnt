@@ -60,7 +60,7 @@ public class BidControllerTest {
                 .andExpect(jsonPath("$[0].userId").value(1))
                 .andExpect(jsonPath("$[0].auctionId").value(1));
     }
-
+    
     @Test
     public void getBidById_whenBidExists_shouldReturnBid() throws Exception {
 

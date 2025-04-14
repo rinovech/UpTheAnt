@@ -10,14 +10,9 @@ public class MainController {
         return "index"; 
     }
 
-    @GetMapping("/register")
-    public String showRegisterForm() {
-        return "signup";
-    }
-
-    @GetMapping("/login")
-    public String showLogForm() {
-        return "login";
+    @GetMapping("/lk")
+    public String lk() {
+        return "lk"; 
     }
 } 
     
