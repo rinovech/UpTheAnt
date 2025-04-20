@@ -46,23 +46,24 @@ public class SecurityConfiguration {
                     "/auth/**",
                     "/view/auth/**",
                     "/static/**",
-                    "/static/images/**",
+                    "/images/**",
                     "/css/**",
                     "/js/**",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
-                    "/",
+                    "/favicon.ico",
                     "/error",
-                    "/csrf",
-                    "/lk"
+                    "/",
+                    "/lk",
+                    "/lk.html",
+                    "/login.html",
+                    "/lk/userbids",
+                    "userbids.html",
+                    "/lk/userauctions",
+                    "userauctions.html"
                 ).permitAll()
+                .requestMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/view/auth/login")
-                .defaultSuccessUrl("/lk")
-                .failureUrl("/view/auth/login?error")
-                .permitAll()
             )
             .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
             .authenticationProvider(authenticationProvider())

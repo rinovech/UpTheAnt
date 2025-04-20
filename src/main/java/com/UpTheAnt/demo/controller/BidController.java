@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.uptheant.demo.dto.bid.BidCreateDTO;
 import com.uptheant.demo.dto.bid.BidResponseDTO;
+import com.uptheant.demo.dto.user.UserBidDTO;
 import com.uptheant.demo.exception.BusinessRuleException;
 import com.uptheant.demo.exception.EntityNotFoundException;
 import com.uptheant.demo.service.bid.BidService;
@@ -152,5 +153,13 @@ public class BidController {
         } catch (BusinessRuleException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/auctions/{auctionId}/users/{userId}/bids")
+    public ResponseEntity<List<UserBidDTO>> getUserBidsForAuction(
+            @PathVariable Integer auctionId,
+            @PathVariable Integer userId) {
+        List<UserBidDTO> bids = bidService.getUserBidsForAuction(userId, auctionId);
+        return ResponseEntity.ok(bids);
     }
 }

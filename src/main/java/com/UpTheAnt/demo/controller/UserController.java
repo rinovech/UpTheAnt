@@ -3,6 +3,8 @@ package com.uptheant.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import com.uptheant.demo.service.user.UserService;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+import com.uptheant.demo.dto.auction.AuctionParticipationDTO;
 import com.uptheant.demo.dto.user.UserCreateDTO;
 import com.uptheant.demo.dto.user.UserResponseDTO;
 
@@ -126,5 +129,35 @@ public class UserController {
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserResponseDTO> getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+
+        UserResponseDTO user = userService.getUserByUsername(userDetails.getUsername());
+        
+        return ResponseEntity.ok(
+            new UserResponseDTO(
+                user.getName(),
+                user.getUsername(),
+                user.getEmail()
+            )
+        );
+    }
+
+    @GetMapping("/{username}/auction-participations")
+    public ResponseEntity<List<AuctionParticipationDTO>> getUserAuctionParticipations(
+            @PathVariable String username) {
+        List<AuctionParticipationDTO> participations = 
+                userService.getUserAuctionParticipations(username);
+        return ResponseEntity.ok(participations);
+    }
+
+    @GetMapping("/{username}/created-auctions")
+    public ResponseEntity<List<AuctionParticipationDTO>> getUserAuctionCreations(
+            @PathVariable String username) {
+        List<AuctionParticipationDTO> participations = 
+                userService.getUserAuctionCreations(username);
+        return ResponseEntity.ok(participations);
     }
 }

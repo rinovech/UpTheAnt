@@ -81,9 +81,7 @@
     <div class="login-container">
         <h1>Вход в систему</h1>
         
-        <form action="/view/auth/signin" method="POST" enctype="application/json">
-            <input type="hidden" name="_csrf" value="${_csrf.token}" />
-            
+        <form id="loginForm">
             <div class="form-group">
                 <label for="username">Имя пользователя:</label>
                 <input type="text" id="username" name="username" required>
@@ -95,8 +93,36 @@
             </div>
             
             <button type="submit">Войти</button>
-            
         </form>
+
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const response = await fetch('/auth/signin', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    if (!response.ok) throw new Error('Ошибка авторизации');
+
+                    const data = await response.json();
+
+                    localStorage.setItem('jwtToken', data.token);
+
+                    window.location.href = '/lk';
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+        </script>
         
         <div class="register-link">
             Нет аккаунта? <a href="/view/auth/register">Зарегистрируйтесь</a>

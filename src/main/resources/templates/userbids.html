@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Мои ставки</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Manrope, sans-serif;
+        }
+        body {
+            margin: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background: #555;
+            color: white;
+            padding: 20px 0;
+        }
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgb(162, 162, 162)
+        }
+        .sidebar-nav {
+            padding: 20px;
+        }
+        .sidebar-nav a {
+            display: block;
+            color: #ecf0f1;
+            padding: 10px 0;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .sidebar-nav a:hover {
+            color: #d11a59;
+        }
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #d11a59;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .logout-btn {
+            background: #f8b78b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .logout-btn:hover{
+            background: #f89c41;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .auction-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .auction-item:last-child {
+            border-bottom: none;
+        }
+        .auction-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #d11a59;
+        }
+        .auction-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .auction-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .bid-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .bid-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        .bid-item:last-child {
+            border-bottom: none;
+        }
+        .no-bids {
+            color: #999;
+            font-style: italic;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .status-active {
+            color: #28a745;
+            font-weight: 500;
+        }
+        .status-finished {
+            color: #dc3545;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Меню</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/lk">Главная</a>
+                <a href="/lk/userauctions">Мои аукционы</a>
+                <a href="/lk/userbids" class="active">Мои ставки</a>
+                <a href="#">Настройки</a>
+                <a href="#">Помощь</a>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>Мои ставки</h1>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">В</div>
+                    <button class="logout-btn" onclick="logout()">Выйти</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Аукционы с моим участием</h2>
+                <div id="auctionsList">
+                    <div class="loading">Загрузка данных...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        async function getUsername() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) return null;
+
+            const response = await fetch('/users/profile', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const userData = await response.json();
+            return userData.username;
+        }
+
+        // Загрузка данных пользователя
+        async function loadUserData() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const response = await fetch('/users/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                const userData = await response.json();
+                document.getElementById('userAvatar').textContent = userData.name.charAt(0).toUpperCase();
+            } catch (error) {
+                console.error('Ошибка загрузки данных пользователя:', error);
+            }
+        }
+
+        async function loadUserAuctions() {
+
+            const username = await getUsername(); 
+            if (!username) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/users/${username}/auction-participations`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки данных');
+                }
+
+                const auctions = await response.json();
+                renderAuctions(auctions);
+            } catch (error) {
+                console.error('Ошибка:', error);
+                document.getElementById('auctionsList').innerHTML = `
+                    <div class="error">Не удалось загрузить данные аукционов. Пожалуйста, попробуйте позже.</div>
+                `;
+            }
+        }
+
+        function renderAuctions(auctions) {
+            const container = document.getElementById('auctionsList');
+            
+            if (!auctions || auctions.length === 0) {
+                container.innerHTML = `<p>Вы не участвовали ни в одном аукционе.</p>`;
+                return;
+            }
+
+            container.innerHTML = auctions.map(auction => {
+ 
+                const endTime = new Date(auction.endTime);
+                const now = new Date();
+                const status = now > endTime ? 'FINISHED' : 'ACTIVE';
+
+                const bids = auction.userBids || [];
+                
+                return `
+                    <div class="auction-item">
+                        <div class="auction-title">
+                            ${auction.name}
+                            <span class="${status === 'ACTIVE' ? 'status-active' : 'status-finished'}">
+                                (${status === 'ACTIVE' ? 'Активен' : 'Завершен'})
+                            </span>
+                        </div>
+                        <div class="auction-meta">
+                            <span>Начальная цена: ${auction.startPrice} ₽</span>
+                            <span>Текущая ставка: ${auction.currentBid || auction.startPrice} ₽</span>
+                            <span>${status === 'ACTIVE' ? 'Завершается' : 'Завершен'}: ${formatDate(auction.endTime)}</span>
+                        </div>
+                        <div class="auction-description">${auction.description}</div>
+                        
+                        <div class="bid-list">
+                            <strong>Мои ставки:</strong>
+                            ${bids.length > 0 ? 
+                                bids.map(bid => `
+                                    <div class="bid-item">
+                                        <span>${bid.amount} ₽</span>
+                                        <span>${formatDateTime(bid.bidTime)}</span>
+                                    </div>
+                                `).join('') : 
+                                '<div class="no-bids">Вы не делали ставок на этом аукционе</div>'
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU');
+        }
+
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('ru-RU');
+        }
+
+        function logout() {
+            localStorage.removeItem('jwtToken');
+            window.location.href = '/login';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserData();
+            loadUserAuctions();
+        });
+    </script>
+</body>
+</html>

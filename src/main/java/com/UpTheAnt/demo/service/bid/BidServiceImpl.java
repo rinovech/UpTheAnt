@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.uptheant.demo.dto.bid.BidCreateDTO;
 import com.uptheant.demo.dto.bid.BidResponseDTO;
+import com.uptheant.demo.dto.user.UserBidDTO;
 import com.uptheant.demo.exception.EntityNotFoundException;
 import com.uptheant.demo.model.Auction;
 import com.uptheant.demo.model.Bid;
@@ -12,13 +13,16 @@ import com.uptheant.demo.model.User;
 import com.uptheant.demo.repository.AuctionRepository;
 import com.uptheant.demo.repository.BidRepository;
 import com.uptheant.demo.repository.UserRepository;
+import com.uptheant.demo.service.auction.AuctionService;
 import com.uptheant.demo.service.mapper.BidMapper;
+import com.uptheant.demo.service.user.UserService;
 import com.uptheant.demo.service.validation.BidValidator;
 
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +33,8 @@ public class BidServiceImpl implements BidService {
     private final UserRepository userRepository;
     private final BidValidator bidValidator;
     private final BidMapper bidMapper;
+    private final AuctionService auctionService;
+    private final UserService userService;
 
     @Override
     @Transactional(readOnly = true)
@@ -80,5 +86,23 @@ public class BidServiceImpl implements BidService {
             throw new EntityNotFoundException("Bid not found with ID: " + id);
         }
         bidRepository.deleteById(id);
+    }
+
+    public List<UserBidDTO> getUserBidsForAuction(Integer userId, Integer auctionId) {
+
+        userService.getUserById(userId); 
+        auctionService.getAuctionById(auctionId);
+        
+        return bidRepository.findByUserUserIdAndAuctionAuctionId(userId, auctionId)
+                .stream()
+                .map(this::convertToUserBidDTO)
+                .collect(Collectors.toList());
+    }
+    
+    private UserBidDTO convertToUserBidDTO(Bid bid) {
+        return UserBidDTO.builder()
+                .amount(bid.getBidAmount())
+                .bidTime(bid.getBidTime())
+                .build();
     }
 }

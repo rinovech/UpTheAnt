@@ -14,5 +14,15 @@ public class MainController {
     public String lk() {
         return "lk"; 
     }
+
+    @GetMapping("/lk/userbids")
+    public String lkuserbids() {
+        return "userbids"; 
+    }
+
+    @GetMapping("/lk/userauctions")
+    public String lkuserauctions() {
+        return "userauctions"; 
+    }
 } 
     

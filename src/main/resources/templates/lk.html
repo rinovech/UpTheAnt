@@ -98,9 +98,9 @@
                 <h2>Меню</h2>
             </div>
             <nav class="sidebar-nav">
-                <a href="/" class="active">Главная</a>
-                <a href="#">Мои аукционы</a>
-                <a href="#">Мои ставки</a>
+                <a href="/lk" class="active">Главная</a>
+                <a href="/lk/userauctions">Мои аукционы</a>
+                <a href="/lk/userbids">Мои ставки</a>
                 <a href="#">Настройки</a>
                 <a href="#">Помощь</a>
             </nav>
@@ -132,24 +132,43 @@
     </div>
 
     <script>
+        async function loadUserData() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const userData = {
-                name: "Вероника",
-                email: "veronika@example.com",
-                initials: "В"
-            };
+            try {
+                const response = await fetch('/users/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
 
-            document.getElementById('username').textContent = userData.name;
-            document.getElementById('userEmail').textContent = userData.email;
-            document.getElementById('userAvatar').textContent = userData.initials;
-        });
+                if (response.status === 401) {
+                    localStorage.removeItem('jwtToken');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                const userData = await response.json();
+
+                document.getElementById('username').textContent = userData.name || userData.username;
+                document.getElementById('userEmail').textContent = userData.email;
+                document.getElementById('userAvatar').textContent = userData.name.charAt(0).toUpperCase();
+                
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+            }
+        }
 
         function logout() {
-
-            console.log('Выход из системы');
-            window.location.href = '/login.html'; 
+            localStorage.removeItem('jwtToken');
+            window.location.href = '/login.html';
         }
+
+        document.addEventListener('DOMContentLoaded', loadUserData);
     </script>
 </body>
 </html>
