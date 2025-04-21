@@ -46,7 +46,7 @@ public class UserControllerTest extends DemoApplicationTests{
         userCreateDTO.setPassword("Password123!");
 
         mockMvc.perform(
-                post("/users")
+                post("/api/users")
                     .content(objectMapper.writeValueAsString(userCreateDTO))
                     .contentType(MediaType.APPLICATION_JSON)
         )
@@ -67,7 +67,7 @@ public class UserControllerTest extends DemoApplicationTests{
         User savedUser = userRepository.save(user);
 
         mockMvc.perform(
-                get("/users/{id}", savedUser.getUserId()))
+                get("/api/users/{id}", savedUser.getUserId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Veronika"))
                 .andExpect(jsonPath("$.username").value("veronika123"))
@@ -77,7 +77,7 @@ public class UserControllerTest extends DemoApplicationTests{
     @Test
     public void givenId_whenGetNonExistingUser_thenStatus404() throws Exception {
         mockMvc.perform(
-                get("/users/{id}", 999))
+                get("/api/users/{id}", 999))
                 .andExpect(status().isNotFound());
     }
 
@@ -98,7 +98,7 @@ public class UserControllerTest extends DemoApplicationTests{
         userRepository.save(user1);
         userRepository.save(user2);
 
-        mockMvc.perform(get("/users"))
+        mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name", is("Veronika")))
@@ -120,7 +120,7 @@ public class UserControllerTest extends DemoApplicationTests{
         User savedUser = userRepository.save(user);
 
         mockMvc.perform(
-                delete("/users/{id}", savedUser.getUserId()))
+                delete("/api/users/{id}", savedUser.getUserId()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("User with ID " + savedUser.getUserId() + " was deleted")));
     }
@@ -128,7 +128,7 @@ public class UserControllerTest extends DemoApplicationTests{
     @Test
     public void givenId_whenDeleteNonExistingUser_thenStatus404() throws Exception {
         mockMvc.perform(
-                delete("/users/{id}", 999))
+                delete("/api/users/{id}", 999))
                 .andExpect(status().isNotFound());
     }
 
@@ -137,7 +137,7 @@ public class UserControllerTest extends DemoApplicationTests{
         UserCreateDTO userCreateDTO = new UserCreateDTO();
         
         mockMvc.perform(
-                post("/users")
+                post("/api/users")
                     .content(objectMapper.writeValueAsString(userCreateDTO))
                     .contentType(MediaType.APPLICATION_JSON)
         )
@@ -155,7 +155,7 @@ public class UserControllerTest extends DemoApplicationTests{
         userRepository.save(user);
 
         mockMvc.perform(
-                get("/users/by-username/{username}", "veronika123"))
+                get("/api/users/by-username/{username}", "veronika123"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("veronika123"));
     }
@@ -163,7 +163,7 @@ public class UserControllerTest extends DemoApplicationTests{
     @Test
     public void givenUserByUsername_whenNotExists_thenStatus404() throws Exception {
         mockMvc.perform(
-                get("/users/by-username/{username}", "nonexistent"))
+                get("/api/users/by-username/{username}", "nonexistent"))
                 .andExpect(status().isNotFound());
     }
 }

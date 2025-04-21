@@ -105,4 +105,27 @@ public class BidServiceImpl implements BidService {
                 .bidTime(bid.getBidTime())
                 .build();
     }
+
+    public BidResponseDTO placeBidByUsername(BidCreateDTO bidCreateDTO, String username, Integer auctionId) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+        
+        Auction auction = auctionRepository.findById(auctionId)
+            .orElseThrow(() -> new EntityNotFoundException("Аукцион не найден"));
+        
+        bidValidator.validateBidCreation(bidCreateDTO, user.getUserId(), auctionId);
+        
+        Bid bid = new Bid();
+        bid.setUser(user);
+        bid.setAuction(auction);
+        bid.setBidAmount(bidCreateDTO.getBidAmount());
+        bid.setBidTime(LocalDateTime.now());
+        
+        Bid savedBid = bidRepository.save(bid);
+
+        auction.setCurrentBid(savedBid.getBidAmount());
+        auctionRepository.save(auction);
+        
+        return bidMapper.toDto(savedBid);
+    }
 }

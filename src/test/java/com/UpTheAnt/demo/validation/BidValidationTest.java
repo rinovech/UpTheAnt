@@ -42,7 +42,7 @@ public class BidValidationTest extends DemoApplicationTests {
 
     @BeforeEach
     void setUp() {
-        // Создаем тестового пользователя
+
         testUser = User.builder()
             .name("Test User")
             .username("testuser" + UUID.randomUUID().toString().substring(0, 8))
@@ -52,17 +52,16 @@ public class BidValidationTest extends DemoApplicationTests {
 
         testUser = userRepository.save(testUser);
 
-        // Создаем тестовый аукцион
         testAuction = Auction.builder()
             .name("Test Auction")
             .description("Test Description")
             .startPrice(startPrice)
             .minBidStep(minBidStep)
-            .startTime(LocalDateTime.now().minusDays(1))  // Аукцион уже начался
+            .startTime(LocalDateTime.now().minusDays(1))  
             .endTime(LocalDateTime.now().plusDays(7))
             .user(testUser) 
             .status(true)
-            .currentBid(startPrice)  // Начальная ставка
+            .currentBid(startPrice) 
             .build();
 
         testAuction = auctionRepository.save(testAuction);

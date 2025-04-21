@@ -1,6 +1,7 @@
 package com.uptheant.demo.service.auction;
 
 import com.uptheant.demo.dto.auction.AuctionCreateDTO;
+import com.uptheant.demo.dto.auction.AuctionParticipationDTO;
 import com.uptheant.demo.dto.auction.AuctionResponseDTO;
 
 import java.util.List;
@@ -11,4 +12,5 @@ public interface AuctionService {
     AuctionResponseDTO createAuction(AuctionCreateDTO auctionCreateDTO, Integer sellerId);
     void deleteAuction(Integer id);
     void closeAuction(Integer auctionId);
+    AuctionParticipationDTO getAuctionWithBids(Integer id);
 }

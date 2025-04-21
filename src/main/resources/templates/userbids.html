@@ -15,6 +15,79 @@
             background-color: #f5f5f5;
             color: #333;
         }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 10px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .logo .up {
+            color: #d11a59;
+        }
+        
+        .logo .the {
+            color: #000000;
+        }
+        
+        .logo .ant {
+            color: #ffa041;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style-type: none;
+        }
+        
+        nav ul li {
+            margin-right: 30px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: #555;
+            font-size: 14px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #d11a59;
+        }
+        
+        .location {
+            display: flex;
+            align-items: center;
+        }
+        
+        .location-icon {
+            margin-right: 10px;
+            color: #333;
+        }
+        
+        .location-text {
+            font-size: 14px;
+            color: #555;
+        }
         .dashboard {
             display: flex;
             min-height: 100vh;
@@ -142,16 +215,91 @@
             color: #dc3545;
             font-weight: 500;
         }
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn.active {
+            background: #d11a59;
+            color: white;
+            border-color: #d11a59;
+        }
+        .winner-badge {
+            background: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .auction-link {
+            color: #d11a59;
+            text-decoration: none;
+            transition: color 0.3s;
+            margin-right: 10px;
+        }
+        .auction-link:hover {
+            color: #a00;
+        }
+        .auction-link {
+            color: #d11a59;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .auction-link:hover {
+            color: #a00;
+        }
+
     </style>
 </head>
 <body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="up">UP.</span><span class="the">THE.</span><span class="ant">ANT</span>
+                </div>
+                
+                <nav>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/allauctions">Все аукционы</a></li>
+                        <li><a href="#">Лоты с рубля</a></li>
+                        <li><a href="#">Продать</a></li>
+                        <li><a href="/lk">Личный кабинет</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="location">
+                    <div class="location-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                        </svg>
+                    </div>
+                    <div class="location-text">
+                        <span>САРАТОВ, ВОЛЬСКАЯ, 10А</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
     <div class="dashboard">
         <div class="sidebar">
             <div class="sidebar-header">
                 <h2>Меню</h2>
             </div>
             <nav class="sidebar-nav">
-                <a href="/lk">Главная</a>
+                <a href="/lk">Личный кабинет</a>
                 <a href="/lk/userauctions">Мои аукционы</a>
                 <a href="/lk/userbids" class="active">Мои ставки</a>
                 <a href="#">Настройки</a>
@@ -170,6 +318,14 @@
 
             <div class="card">
                 <h2>Аукционы с моим участием</h2>
+                
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">Все</button>
+                    <button class="filter-btn" data-filter="active">Активные</button>
+                    <button class="filter-btn" data-filter="finished">Завершенные</button>
+                    <button class="filter-btn" data-filter="won">Победы</button>
+                </div>
+                
                 <div id="auctionsList">
                     <div class="loading">Загрузка данных...</div>
                 </div>
@@ -183,14 +339,13 @@
             const token = localStorage.getItem('jwtToken');
             if (!token) return null;
 
-            const response = await fetch('/users/profile', {
+            const response = await fetch('/api/users/profile', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const userData = await response.json();
             return userData.username;
         }
 
-        // Загрузка данных пользователя
         async function loadUserData() {
             const token = localStorage.getItem('jwtToken');
             if (!token) {
@@ -199,7 +354,7 @@
             }
 
             try {
-                const response = await fetch('/users/profile', {
+                const response = await fetch('/api/users/profile', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -221,18 +376,18 @@
 
             const username = await getUsername(); 
             if (!username) {
-                window.location.href = '/login';
+                window.location.href = '/view/auth/login';
                 return;
             }
 
             const token = localStorage.getItem('jwtToken');
             if (!token) {
-                window.location.href = '/login';
+                window.location.href = '/view/auth/login';
                 return;
             }
 
             try {
-                const response = await fetch(`/users/${username}/auction-participations`, {
+                const response = await fetch(`/api/users/${username}/auction-participations`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
                     }
@@ -252,7 +407,10 @@
             }
         }
 
+        let allAuctions = [];
+
         function renderAuctions(auctions) {
+            allAuctions = auctions; 
             const container = document.getElementById('auctionsList');
             
             if (!auctions || auctions.length === 0) {
@@ -261,20 +419,23 @@
             }
 
             container.innerHTML = auctions.map(auction => {
- 
                 const endTime = new Date(auction.endTime);
                 const now = new Date();
                 const status = now > endTime ? 'FINISHED' : 'ACTIVE';
-
                 const bids = auction.userBids || [];
+
+                const isWinner = status === 'FINISHED' && 
+                               bids.length > 0 && 
+                               auction.currentBid === bids[bids.length - 1].amount;
                 
                 return `
-                    <div class="auction-item">
+                    <div class="auction-item" data-status="${status.toLowerCase()}" ${isWinner ? 'data-won="true"' : ''}>
                         <div class="auction-title">
-                            ${auction.name}
+                            <a href="/auction/${auction.auctionId}" class="auction-link">${auction.name}</a>
                             <span class="${status === 'ACTIVE' ? 'status-active' : 'status-finished'}">
                                 (${status === 'ACTIVE' ? 'Активен' : 'Завершен'})
                             </span>
+                            ${isWinner ? '<span class="winner-badge">Победитель</span>' : ''}
                         </div>
                         <div class="auction-meta">
                             <span>Начальная цена: ${auction.startPrice} ₽</span>
@@ -284,7 +445,7 @@
                         <div class="auction-description">${auction.description}</div>
                         
                         <div class="bid-list">
-                            <strong>Мои ставки:</strong>
+                            <strong>Мои ставки (${bids.length}):</strong>
                             ${bids.length > 0 ? 
                                 bids.map(bid => `
                                     <div class="bid-item">
@@ -298,6 +459,47 @@
                     </div>
                 `;
             }).join('');
+
+            initFilters();
+        }
+
+        function initFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+
+                    filterBtns.forEach(b => b.classList.remove('active'));
+
+                    btn.classList.add('active');
+
+                    applyFilter(btn.dataset.filter);
+                });
+            });
+        }
+
+        function applyFilter(filterType) {
+            const auctionItems = document.querySelectorAll('.auction-item');
+            
+            auctionItems.forEach(item => {
+                const status = item.dataset.status;
+                const isWon = item.dataset.won === 'true';
+                let showItem = true;
+                
+                switch(filterType) {
+                    case 'active':
+                        showItem = status === 'active';
+                        break;
+                    case 'finished':
+                        showItem = status === 'finished';
+                        break;
+                    case 'won':
+                        showItem = isWon;
+                        break;
+                }
+                
+                item.style.display = showItem ? 'block' : 'none';
+            });
         }
 
         function formatDate(dateString) {
@@ -312,7 +514,7 @@
 
         function logout() {
             localStorage.removeItem('jwtToken');
-            window.location.href = '/login';
+            window.location.href = '/';
         }
 
         document.addEventListener('DOMContentLoaded', () => {

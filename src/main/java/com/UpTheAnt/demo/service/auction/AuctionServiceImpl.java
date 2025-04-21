@@ -2,11 +2,15 @@ package com.uptheant.demo.service.auction;
 
 import com.uptheant.demo.model.User;
 import com.uptheant.demo.dto.auction.AuctionCreateDTO;
+import com.uptheant.demo.dto.auction.AuctionParticipationDTO;
 import com.uptheant.demo.dto.auction.AuctionResponseDTO;
+import com.uptheant.demo.dto.user.UserBidDTO;
 import com.uptheant.demo.exception.BusinessRuleException;
 import com.uptheant.demo.exception.EntityNotFoundException;
 import com.uptheant.demo.model.Auction;
+import com.uptheant.demo.model.Bid;
 import com.uptheant.demo.repository.AuctionRepository;
+import com.uptheant.demo.repository.BidRepository;
 import com.uptheant.demo.repository.UserRepository;
 import com.uptheant.demo.service.mapper.AuctionMapper;
 import com.uptheant.demo.service.validation.AuctionValidator;
@@ -29,6 +33,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final AuctionValidator auctionValidator;
     private final AuctionMapper auctionMapper;
     private final UserRepository userRepository;
+    private final BidRepository bidRepository;
 
     @Override
     public List<AuctionResponseDTO> getAllAuctions() {
@@ -117,5 +122,34 @@ public class AuctionServiceImpl implements AuctionService {
         auctionRepository.deleteById(id);
         
         logger.info("Auction deleted: ID {}", id);
+    }
+
+    public AuctionParticipationDTO getAuctionWithBids(Integer id) {
+        Auction auction = auctionRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Аукцион не найден"));
+
+        List<UserBidDTO> bids = bidRepository.findByAuction(auction).stream()
+            .map(this::convertToUserBidDTO)
+            .collect(Collectors.toList());
+
+        return AuctionParticipationDTO.builder()
+            .auctionId(auction.getAuctionId())
+            .name(auction.getName())
+            .description(auction.getDescription())
+            .startPrice(auction.getStartPrice())
+            .currentBid(auction.getCurrentBid())
+            .endTime(auction.getEndTime())
+            .minBidStep((auction.getMinBidStep()))
+            .userBids(bids)
+            .sellerUsername(auction.getUser().getUsername())
+            .build();
+    }
+
+    private UserBidDTO convertToUserBidDTO(Bid bid) {
+        return UserBidDTO.builder()
+            .bidderUsername(bid.getUser().getUsername())
+            .amount(bid.getBidAmount())
+            .bidTime(bid.getBidTime())
+            .build();
     }
 }

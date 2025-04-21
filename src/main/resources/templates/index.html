@@ -7,25 +7,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
             font-family: Manrope, sans-serif;
         }
         
         body {
+            margin: 0;
             background-color: #f5f5f5;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
         }
         
         header {
             background-color: #ffffff;
-            padding: 20px 0;
-            position: relative;
+            padding: 10px 0;
+            position: sticky;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            top: 0;
+            z-index: 100;
         }
         
         .header-content {
@@ -287,11 +290,11 @@
                 
                 <nav>
                     <ul>
-                        <li><a href="#">Активные торги</a></li>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/allauctions">Все аукционы</a></li>
                         <li><a href="#">Лоты с рубля</a></li>
                         <li><a href="#">Продать</a></li>
-                        <li><a href="#">Доставка</a></li>
-                        <li><a href="/view/auth/login">Личный кабинет</a></li>
+                        <li><a href="/lk">Личный кабинет</a></li>
                     </ul>
                 </nav>
                 
@@ -302,7 +305,7 @@
                         </svg>
                     </div>
                     <div class="location-text">
-                        <span>САРАТОВ, <br>ВОЛЬСКАЯ, 10А</span>
+                        <span>САРАТОВ, ВОЛЬСКАЯ, 10А</span>
                     </div>
                 </div>
             </div>

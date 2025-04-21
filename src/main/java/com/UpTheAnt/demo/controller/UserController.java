@@ -27,7 +27,7 @@ import com.uptheant.demo.dto.user.UserResponseDTO;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @Tag(name = "User API", description = "Операции с пользователями")
 public class UserController {
 
@@ -135,7 +135,7 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
 
         UserResponseDTO user = userService.getUserByUsername(userDetails.getUsername());
-        
+
         return ResponseEntity.ok(
             new UserResponseDTO(
                 user.getName(),

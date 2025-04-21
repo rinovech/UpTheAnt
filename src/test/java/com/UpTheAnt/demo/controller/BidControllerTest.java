@@ -54,7 +54,7 @@ public class BidControllerTest {
 
         when(bidService.getAllBids()).thenReturn(bids);
 
-        mockMvc.perform(get("/bids"))
+        mockMvc.perform(get("/api/bids"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].bidAmount").value(100.0))
                 .andExpect(jsonPath("$[0].userId").value(1))
@@ -72,7 +72,7 @@ public class BidControllerTest {
 
         when(bidService.getBidById(1)).thenReturn(bidResponseDTO);
 
-        mockMvc.perform(get("/bids/1"))
+        mockMvc.perform(get("/api/bids/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.bidAmount").value(100.0))
                 .andExpect(jsonPath("$.userId").value(1))
@@ -84,7 +84,7 @@ public class BidControllerTest {
 
         when(bidService.getBidById(1)).thenThrow(new RuntimeException("Bid not found"));
 
-        mockMvc.perform(get("/bids/1"))
+        mockMvc.perform(get("/api/bids/1"))
                 .andExpect(status().isNotFound());
     }
 
@@ -102,7 +102,7 @@ public class BidControllerTest {
 
         when(bidService.createBid(any(BidCreateDTO.class), eq(1), eq(1))).thenReturn(bidResponseDTO);
 
-        mockMvc.perform(post("/bids")
+        mockMvc.perform(post("/api/bids")
                 .param("userId", "1")
                 .param("auctionId", "1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +118,7 @@ public class BidControllerTest {
 
         doNothing().when(bidService).deleteBid(1);
 
-        mockMvc.perform(delete("/bids/1"))
+        mockMvc.perform(delete("/api/bids/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Bid with ID 1 was successfully deleted."));
     }

@@ -162,6 +162,7 @@ public class UserServiceImpl implements UserService {
                 .currentBid(auction.getCurrentBid())
                 .minBidStep(auction.getMinBidStep())
                 .startTime(auction.getStartTime())
+                .sellerUsername(auction.getUser().getUsername())
                 .endTime(auction.getEndTime())
                 .userBids(userBids)
                 .build();
@@ -187,6 +188,7 @@ public class UserServiceImpl implements UserService {
                 .minBidStep(auction.getMinBidStep())
                 .startTime(auction.getStartTime())
                 .endTime(auction.getEndTime())
+                .sellerUsername(auction.getUser().getUsername())
                 .userBids(getUserBidsForAuction(auction))
                 .build();
     }

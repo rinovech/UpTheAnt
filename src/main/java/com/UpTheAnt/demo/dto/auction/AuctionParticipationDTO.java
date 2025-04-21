@@ -21,4 +21,6 @@ public class AuctionParticipationDTO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private List<UserBidDTO> userBids;
+    private String sellerUsername;
+    private boolean status;
 }

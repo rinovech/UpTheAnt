@@ -12,4 +12,5 @@ public interface BidService {
     BidResponseDTO createBid(BidCreateDTO bidCreateDTO, Integer userId, Integer auctionId);
     void deleteBid(Integer id);
     List<UserBidDTO> getUserBidsForAuction(Integer auctionId, Integer userId);
+    BidResponseDTO placeBidByUsername(BidCreateDTO bidCreateDTO, String username, Integer auctionId) ;
 } 

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все аукционы | UP.THE.ANT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Manrope', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 10px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .logo .up {
+            color: #d11a59;
+        }
+        
+        .logo .the {
+            color: #000000;
+        }
+        
+        .logo .ant {
+            color: #ffa041;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style-type: none;
+        }
+        
+        nav ul li {
+            margin-right: 30px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: #555;
+            font-size: 14px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #d11a59;
+        }
+        
+        .location {
+            display: flex;
+            align-items: center;
+        }
+        
+        .location-icon {
+            margin-right: 10px;
+            color: #333;
+        }
+        
+        .location-text {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .auctions-content {
+            padding: 40px 0;
+        }
+
+        .page-title {
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .auction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .auction-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .auction-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .auction-image {
+            height: 200px;
+            background-color: #eee;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .auction-details {
+            padding: 20px;
+        }
+
+        .auction-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .auction-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .auction-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0px;
+        }
+
+        .auction-price {
+            font-weight: 700;
+            color: #d11a59;
+            font-size: 18px;
+        }
+
+        .auction-time {
+            color: #666;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+
+        .auction-time svg {
+            margin-right: 5px;
+        }
+
+        .auction-status {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #e6f7ee;
+            color: #28a745;
+        }
+
+        .status-finished {
+            background-color: #fdeaea;
+            color: #dc3545;
+        }
+
+        .view-button {
+            display: block;
+            text-align: center;
+            background-color: #f8b78b;
+            color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .view-button:hover {
+            background-color: #f89c41;
+            color: #fff;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: #d11a59;
+            color: white;
+            border-color: #d11a59;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            grid-column: 1/-1;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #d11a59;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .pagination button {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pagination button.active {
+            background: #d11a59;
+            color: white;
+            border-color: #d11a59;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            padding-left: 45px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #d11a59;
+            box-shadow: 0 0 0 2px rgba(209, 26, 89, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="up">UP.</span><span class="the">THE.</span><span class="ant">ANT</span>
+                </div>
+                
+                <nav>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/allauctions" class="active">Все аукционы</a></li>
+                        <li><a href="#">Лоты с рубля</a></li>
+                        <li><a href="#">Продать</a></li>
+                        <li><a href="/lk">Личный кабинет</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="location">
+                    <div class="location-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                        </svg>
+                    </div>
+                    <div class="location-text">
+                        <span>САРАТОВ, ВОЛЬСКАЯ, 10А</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        <div class="auctions-content">
+            <h1 class="page-title">Все аукционы</h1>
+
+            <div class="search-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+                <input type="text" class="search-input" placeholder="Поиск по названию или описанию..." id="searchInput">
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Все</button>
+                <button class="filter-btn" data-filter="active">Активные</button>
+                <button class="filter-btn" data-filter="finished">Завершенные</button>
+            </div>
+            
+            <div class="auction-grid" id="auctions-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Загрузка аукционов...</p>
+                </div>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </main>
+
+    <script>
+        let allAuctions = [];
+        let filteredAuctions = [];
+        let currentPage = 1;
+        const itemsPerPage = 5;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAuctions();
+            setupFilters();
+            setupSearch();
+        });
+
+        async function loadAuctions() {
+            const container = document.getElementById('auctions-container');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Загрузка аукционов...</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/api/auctions');
+                allAuctions = await response.json();
+ 
+                filteredAuctions = [...allAuctions];
+                
+                renderAuctions();
+            } catch (error) {
+                console.error('Ошибка загрузки аукционов:', error);
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                        <h3>Не удалось загрузить аукционы</h3>
+                        <p>Пожалуйста, попробуйте позже</p>
+                        <button onclick="loadAuctions()" style="
+                            background: #f8b78b;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            margin-top: 15px;
+                        ">Попробовать снова</button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderAuctions() {
+
+            applyFilters();
+
+            applySearch();
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const paginatedAuctions = filteredAuctions.slice(startIndex, startIndex + itemsPerPage);
+            
+            const container = document.getElementById('auctions-container');
+            
+            if (paginatedAuctions.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                        <p>Аукционы не найдены</p>
+                    </div>
+                `;
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = paginatedAuctions.map(auction => {
+                const endTime = new Date(auction.endTime);
+                const now = new Date();
+                const isActive = now < endTime;
+                const timeLeft = isActive ? 
+                    `Осталось: ${formatTimeLeft(endTime - now)}` : 
+                    `Завершен: ${formatDate(auction.endTime)}`;
+                
+                return `
+                    <div class="auction-card">
+                        <div class="auction-image"></div>
+                        <div class="auction-details">
+                            <h3 class="auction-title">${auction.name}</h3>
+                            <p class="auction-description">${auction.description}</p>
+                            
+                            <div class="auction-meta">
+                                <div class="auction-price">${auction.currentBid || auction.startPrice} ₽</div>
+                                <div class="auction-time">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                                    </svg>
+                                    ${timeLeft}
+                                </div>
+                            </div>
+                            
+                            <span class="auction-status ${isActive ? 'status-active' : 'status-finished'}">
+                                ${isActive ? 'Активен' : 'Завершен'}
+                            </span>
+                            
+                            <a href="/auction/${auction.auctionId}" class="view-button">Подробнее</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updatePagination();
+        }
+
+        function applyFilters() {
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            
+            filteredAuctions = allAuctions.filter(auction => {
+                const now = new Date();
+                const endTime = new Date(auction.endTime);
+                const isActive = now < endTime;
+                
+                if (activeFilter === 'all') return true;
+                if (activeFilter === 'active') return isActive;
+                if (activeFilter === 'finished') return !isActive;
+                
+                return true;
+            });
+        }
+
+        function applySearch() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (searchQuery) {
+                filteredAuctions = filteredAuctions.filter(auction => {
+                    return auction.name.toLowerCase().includes(searchQuery) || 
+                           auction.description.toLowerCase().includes(searchQuery);
+                });
+            }
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredAuctions.length / itemsPerPage);
+            const paginationContainer = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+            
+            let paginationHTML = '';
+
+            paginationHTML += `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    Назад
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHTML += `
+                    <button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>
+                        ${i}
+                    </button>
+                `;
+            }
+
+            paginationHTML += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Вперед
+                </button>
+            `;
+            
+            paginationContainer.innerHTML = paginationHTML;
+        }
+
+        function changePage(page) {
+            if (page < 1 || page > Math.ceil(filteredAuctions.length / itemsPerPage)) return;
+            currentPage = page;
+            renderAuctions();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function setupFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentPage = 1; 
+                    renderAuctions();
+                });
+            });
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1; 
+                    renderAuctions();
+                }, 500);
+            });
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU');
+        }
+
+        function formatTimeLeft(ms) {
+            const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            return `${days}д ${hours}ч`;
+        }
+    </script>
+</body>
+</html>

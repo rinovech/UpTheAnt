@@ -56,13 +56,18 @@ public class SecurityConfiguration {
                     "/",
                     "/lk",
                     "/lk.html",
-                    "/login.html",
+                    "/login",
                     "/lk/userbids",
                     "userbids.html",
                     "/lk/userauctions",
-                    "userauctions.html"
+                    "userauctions.html",
+                    "allauctions.html",
+                    "/allauctions",
+                    "/api/auctions/**",
+                    "/auction/**",
+                    "auction.html"
                 ).permitAll()
-                .requestMatchers("/api/**").authenticated()
+                .requestMatchers("/api/users/**, /api/system/**","/api/bids/**").authenticated()
                 .anyRequest().authenticated()
             )
             .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))

@@ -117,6 +117,8 @@
 
                     localStorage.setItem('jwtToken', data.token);
 
+                    const urlParams = new URLSearchParams(window.location.search);
+
                     window.location.href = '/lk';
                 } catch (error) {
                     alert(error.message);

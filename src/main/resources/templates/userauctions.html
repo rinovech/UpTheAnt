@@ -15,6 +15,79 @@
             background-color: #f5f5f5;
             color: #333;
         }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 10px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .logo .up {
+            color: #d11a59;
+        }
+        
+        .logo .the {
+            color: #000000;
+        }
+        
+        .logo .ant {
+            color: #ffa041;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style-type: none;
+        }
+        
+        nav ul li {
+            margin-right: 30px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: #555;
+            font-size: 14px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #d11a59;
+        }
+        
+        .location {
+            display: flex;
+            align-items: center;
+        }
+        
+        .location-icon {
+            margin-right: 10px;
+            color: #333;
+        }
+        
+        .location-text {
+            font-size: 14px;
+            color: #555;
+        }
         .dashboard {
             display: flex;
             min-height: 100vh;
@@ -159,16 +232,98 @@
             color: #dc3545;
             font-weight: 500;
         }
+
+        .winner-bid {
+            background-color: #f8f9fa;
+            border-left: 3px solid #28a745;
+            padding-left: 10px;
+        }
+        .winner-badge {
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        .pagination button {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pagination button.active {
+            background: #d11a59;
+            color: white;
+            border-color: #d11a59;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .auction-link {
+            color: #d11a59;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .auction-link:hover {
+            color: #a00;
+        }
+
+
     </style>
 </head>
 <body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="up">UP.</span><span class="the">THE.</span><span class="ant">ANT</span>
+                </div>
+                
+                <nav>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/allauctions">Все аукционы</a></li>
+                        <li><a href="#">Лоты с рубля</a></li>
+                        <li><a href="#">Продать</a></li>
+                        <li><a href="/lk">Личный кабинет</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="location">
+                    <div class="location-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                        </svg>
+                    </div>
+                    <div class="location-text">
+                        <span>САРАТОВ, ВОЛЬСКАЯ, 10А</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
     <div class="dashboard">
         <div class="sidebar">
             <div class="sidebar-header">
                 <h2>Меню</h2>
             </div>
             <nav class="sidebar-nav">
-                <a href="/lk">Главная</a>
+                <a href="/lk">Личный кабинет</a>
                 <a href="/lk/userauctions" class="active">Мои аукционы</a>
                 <a href="/lk/userbids">Мои ставки</a>
                 <a href="#">Настройки</a>
@@ -200,7 +355,7 @@
             if (!token) return null;
 
             try {
-                const response = await fetch('/users/profile', {
+                const response = await fetch('/api/users/profile', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
@@ -219,12 +374,12 @@
         async function loadUserData() {
             const token = localStorage.getItem('jwtToken');
             if (!token) {
-                window.location.href = '/login';
+                window.location.href = '/view/auth/login';
                 return;
             }
 
             try {
-                const response = await fetch('/users/profile', {
+                const response = await fetch('/api/users/profile', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -245,18 +400,18 @@
         async function loadUserAuctions() {
             const username = await getUsername();
             if (!username) {
-                window.location.href = '/login';
+                window.location.href = '/view/auth/login';
                 return;
             }
 
             const token = localStorage.getItem('jwtToken');
             if (!token) {
-                window.location.href = '/login';
+                window.location.href = '/view/auth/login';
                 return;
             }
 
             try {
-                const response = await fetch(`/users/${username}/created-auctions`, {
+                const response = await fetch(`/api/users/${username}/created-auctions`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -267,74 +422,141 @@
                 }
 
                 const auctions = await response.json();
-                renderAuctions(auctions);
+                allAuctions = auctions; 
+                renderAuctions();
+                renderPagination();
             } catch (error) {
                 console.error('Ошибка:', error);
                 document.getElementById('auctionsList').innerHTML = `
                     <div class="error">Не удалось загрузить данные аукционов. ${error.message}</div>
                 `;
             }
-        }
 
-        function renderAuctions(auctions) {
-        const container = document.getElementById('auctionsList');
-        
-        if (!auctions || auctions.length === 0) {
-            container.innerHTML = `<p>Вы не создавали ни одного аукциона.</p>`;
-            return;
-        }
-
-        const auctionsArray = Array.isArray(auctions) ? auctions : [auctions];
-        
-        container.innerHTML = auctionsArray.map(auction => {
-
-            const endTime = new Date(auction.endTime);
-            const now = new Date();
-            const status = now > endTime ? 'FINISHED' : 'ACTIVE';
-
-            const bids = auction.userBids || [];
             
-            return `
-                <div class="auction-item">
-                    <div class="auction-title">
-                        ${auction.name}
-                        <span class="${status === 'ACTIVE' ? 'status-active' : 'status-finished'}">
-                            (${status === 'ACTIVE' ? 'Активен' : 'Завершен'})
-                        </span>
-                    </div>
-                    <div class="auction-meta">
-                        <span>Начальная цена: ${auction.startPrice} ₽</span>
-                        <span>Текущая ставка: ${auction.currentBid || auction.startPrice} ₽</span>
-                        <span>${status === 'ACTIVE' ? 'Завершается' : 'Завершен'}: ${formatDate(auction.endTime)}</span>
-                    </div>
-                    <div class="auction-description">${auction.description}</div>
-                    
-                    <div class="bid-list">
-                        <strong>Все ставки (${bids.length}):</strong>
-                        ${bids.length > 0 ? 
-                            bids.map(bid => `
-                                <div class="bid-item">
-                                    <div class="bidder-info">
-                                        <div class="bidder-avatar" title="${bid.bidderUsername}">
-                                            ${bid.bidderUsername?.charAt(0)?.toUpperCase() || '?'}
+        }
+
+        let currentPage = 1;
+        const itemsPerPage = 5; 
+        let allAuctions = [];
+
+        function renderAuctions() {
+            const container = document.getElementById('auctionsList');
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const paginatedAuctions = allAuctions.slice(startIdx, startIdx + itemsPerPage);
+            
+            if (!paginatedAuctions || paginatedAuctions.length === 0) {
+                container.innerHTML = `<p>Вы не создавали ни одного аукциона.</p>`;
+                return;
+            }
+
+            container.innerHTML = paginatedAuctions.map(auction => {
+                const endTime = new Date(auction.endTime);
+                const now = new Date();
+                const status = now > endTime ? 'FINISHED' : 'ACTIVE';
+                const bids = auction.userBids || [];
+  
+                const maxBid = bids.length > 0 ? 
+                    bids.reduce((max, bid) => Number(bid.amount) > Number(max.amount) ? bid : max, bids[0]) : 
+                    null;
+
+                return `
+                    <div class="auction-item">
+                        <div class="auction-title">
+                            <a href="/auction/${auction.auctionId}" class="auction-link">${auction.name}</a>
+                            <span class="${status === 'ACTIVE' ? 'status-active' : 'status-finished'}">
+                                (${status === 'ACTIVE' ? 'Активен' : 'Завершен'})
+                            </span>
+                        </div>
+                        <div class="auction-meta">
+                            <span>Начальная цена: ${auction.startPrice} ₽</span>
+                            <span>Текущая ставка: ${auction.currentBid || auction.startPrice} ₽</span>
+                            <span>${status === 'ACTIVE' ? 'Завершается' : 'Завершен'}: ${formatDate(auction.endTime)}</span>
+                        </div>
+                        <div class="auction-description">${auction.description}</div>
+                        
+                        <div class="bid-list">
+                            <strong>Все ставки (${bids.length}):</strong>
+                            ${bids.length > 0 ? 
+                                bids.map(bid => {
+                                    const isWinner = status === 'FINISHED' && maxBid && 
+                                                   Number(bid.amount) === Number(maxBid.amount) &&
+                                                   new Date(bid.bidTime) >= new Date(maxBid.bidTime);
+                                    return `
+                                    <div class="bid-item ${isWinner ? 'winner-bid' : ''}">
+                                        <div class="bidder-info">
+                                            <div class="bidder-avatar" title="${bid.bidderUsername}">
+                                                ${bid.bidderUsername?.charAt(0)?.toUpperCase() || '?'}
+                                            </div>
+                                            ${bid.bidderUsername}
+                                            ${isWinner ? '<span class="winner-badge">Победитель</span>' : ''}
                                         </div>
-                                        ${bid.bidderUsername }
+                                        <div>
+                                            <span>${bid.amount} ₽</span>
+                                            <span style="margin-left: 15px; color: #666; font-size: 0.9em;">
+                                                ${formatDateTime(bid.bidTime)}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <span>${bid.amount} ₽</span>
-                                        <span style="margin-left: 15px; color: #666; font-size: 0.9em;">
-                                            ${formatDateTime(bid.bidTime)}
-                                        </span>
-                                    </div>
-                                </div>
-                            `).join('') : 
-                            '<div class="no-bids">На этот аукцион еще не было ставок</div>'
-                        }
+                                    `;
+                                }).join('') : 
+                                '<div class="no-bids">На этот аукцион еще не было ставок</div>'
+                            }
+                        </div>
                     </div>
-                </div>
-            `;
-        }).join('');
-    }
+                `;
+            }).join('');
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(allAuctions.length / itemsPerPage);
+            const paginationContainer = document.createElement('div');
+            paginationContainer.className = 'pagination';
+  
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn';
+            prevBtn.innerHTML = '&laquo;';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderAuctions();
+                    renderPagination();
+                }
+            });
+            paginationContainer.appendChild(prevBtn);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderAuctions();
+                    renderPagination();
+                });
+                paginationContainer.appendChild(pageBtn);
+            }
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn';
+            nextBtn.innerHTML = '&raquo;';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderAuctions();
+                    renderPagination();
+                }
+            });
+            paginationContainer.appendChild(nextBtn);
+
+            const card = document.querySelector('.card');
+            const oldPagination = document.querySelector('.pagination');
+            if (oldPagination) {
+                card.removeChild(oldPagination);
+            }
+            card.appendChild(paginationContainer);
+        }
 
         function formatDate(dateString) {
             const date = new Date(dateString);
@@ -354,7 +576,7 @@
 
         function logout() {
             localStorage.removeItem('jwtToken');
-            window.location.href = '/login';
+            window.location.href = '/';
         }
 
         document.addEventListener('DOMContentLoaded', () => {

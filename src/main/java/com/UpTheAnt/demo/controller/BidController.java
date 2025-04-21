@@ -25,7 +25,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bids")
+@RequestMapping("/api/bids")
 @Tag(name = "Bid API", description = "Операции со ставками на аукционах")
 public class BidController {
 
@@ -161,5 +161,22 @@ public class BidController {
             @PathVariable Integer userId) {
         List<UserBidDTO> bids = bidService.getUserBidsForAuction(userId, auctionId);
         return ResponseEntity.ok(bids);
+    }
+
+    @PostMapping("/auctions/{auctionId}/users/{username}/place-bid")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<?> placeBidOnAuction(
+        @PathVariable Integer auctionId,
+        @Valid @RequestBody BidCreateDTO bidCreateDTO,
+        @PathVariable String username) {
+        
+        try {
+            BidResponseDTO createdBid = bidService.placeBidByUsername(bidCreateDTO, username, auctionId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdBid);
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (BusinessRuleException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+        }
     }
 }

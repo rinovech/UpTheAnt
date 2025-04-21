@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuctionResponseDTO {
+    private Integer auctionId;
     private String name;
     private String description;
     private BigDecimal startPrice;

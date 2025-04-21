@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.uptheant.demo.dto.auction.AuctionCreateDTO;
+import com.uptheant.demo.dto.auction.AuctionParticipationDTO;
 import com.uptheant.demo.dto.auction.AuctionResponseDTO;
 import com.uptheant.demo.exception.BusinessRuleException;
 import com.uptheant.demo.exception.EntityNotFoundException;
@@ -24,12 +25,13 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auctions")
+@RequestMapping("/api/auctions")
 @Tag(name = "Auction API", description = "Операции с аукционами")
 public class AuctionController {
 
     @Autowired
     private AuctionService auctionService;
+
 
     @Operation(
         summary = "Получить все аукционы",
@@ -64,8 +66,8 @@ public class AuctionController {
         @Parameter(description = "ID аукциона", example = "1")
         @PathVariable Integer id) {
         try {
-            AuctionResponseDTO auction = auctionService.getAuctionById(id);
-            return ResponseEntity.ok(auction);
+            AuctionParticipationDTO response = auctionService.getAuctionWithBids(id);
+            return ResponseEntity.ok(response);
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         } catch (RuntimeException ex) {

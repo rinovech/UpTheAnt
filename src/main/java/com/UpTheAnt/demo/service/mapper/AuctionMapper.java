@@ -35,6 +35,7 @@ public class AuctionMapper {
 
     public AuctionResponseDTO toDto(Auction auction) {
         return AuctionResponseDTO.builder()
+            .auctionId(auction.getAuctionId())
             .name(auction.getName())
             .description(auction.getDescription())
             .startPrice(auction.getStartPrice())
