@@ -274,7 +274,7 @@
                     <ul>
                         <li><a href="/">Главная</a></li>
                         <li><a href="/allauctions">Все аукционы</a></li>
-                        <li><a href="#">Лоты с рубля</a></li>
+                        <li><a href="/rublots">Лоты с рубля</a></li>
                         <li><a href="#">Продать</a></li>
                         <li><a href="/lk">Личный кабинет</a></li>
                     </ul>
@@ -426,7 +426,7 @@
 
                 const isWinner = status === 'FINISHED' && 
                                bids.length > 0 && 
-                               auction.currentBid === bids[bids.length - 1].amount;
+                               auction.currentBid === bids[0].amount;
                 
                 return `
                     <div class="auction-item" data-status="${status.toLowerCase()}" ${isWinner ? 'data-won="true"' : ''}>

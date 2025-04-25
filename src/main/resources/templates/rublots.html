@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Все аукционы | UP.THE.ANT</title>
+    <title>Лоты с рубля | UP.THE.ANT</title>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -325,8 +325,8 @@
                 <nav>
                     <ul>
                         <li><a href="/">Главная</a></li>
-                        <li><a href="/allauctions" class="active">Все аукционы</a></li>
-                        <li><a href="/rublots">Лоты с рубля</a></li>
+                        <li><a href="/allauctions">Все аукционы</a></li>
+                        <li><a href="/ruble-lots" class="active">Лоты с рубля</a></li>
                         <li><a href="#">Продать</a></li>
                         <li><a href="/lk">Личный кабинет</a></li>
                     </ul>
@@ -348,8 +348,8 @@
     
     <main class="container">
         <div class="auctions-content">
-            <h1 class="page-title">Все аукционы</h1>
-
+            <h1 class="page-title">Лоты с рубля</h1>
+            
             <div class="search-container">
                 <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
@@ -396,9 +396,9 @@
             `;
             
             try {
-                const response = await fetch('/api/auctions');
+                const response = await fetch('/api/auctions?startPrice=1.0');
                 allAuctions = await response.json();
- 
+                
                 filteredAuctions = [...allAuctions];
                 
                 renderAuctions();
@@ -422,9 +422,7 @@
         }
 
         function renderAuctions() {
-
             applyFilters();
-
             applySearch();
 
             const startIndex = (currentPage - 1) * itemsPerPage;
@@ -452,9 +450,9 @@
                 
                 return `
                     <div class="auction-card">
-                        <div class="auction-image"></div>
+                        <div class="auction-image" style="background-image: url('${auction.imageUrl || '/images/default-auction.jpg'}')"></div>
                         <div class="auction-details">
-                            <h3 class="auction-title">${auction.name}
+                            <h3 class="auction-title">${auction.name} 
                                 ${auction.startPrice === 1 ? '<span class="ruble-badge">С рубля</span>' : ''}
                             </h3>
                             <p class="auction-description">${auction.description}</p>

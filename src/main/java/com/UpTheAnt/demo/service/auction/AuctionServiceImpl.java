@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -132,7 +133,7 @@ public class AuctionServiceImpl implements AuctionService {
             .map(this::convertToUserBidDTO)
             .collect(Collectors.toList());
 
-        return AuctionParticipationDTO.builder()
+            return AuctionParticipationDTO.builder()
             .auctionId(auction.getAuctionId())
             .name(auction.getName())
             .description(auction.getDescription())
@@ -150,6 +151,27 @@ public class AuctionServiceImpl implements AuctionService {
             .bidderUsername(bid.getUser().getUsername())
             .amount(bid.getBidAmount())
             .bidTime(bid.getBidTime())
+            .build();
+    }
+
+    public List<AuctionResponseDTO> findByStartPrice(BigDecimal startPrice) {
+
+        List<Auction> auctions = auctionRepository.findByStartPrice(startPrice);
+
+        return auctions.stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+    }
+
+    private AuctionResponseDTO convertToDto(Auction auction) {
+        return AuctionResponseDTO.builder()
+            .auctionId(auction.getAuctionId())
+            .name(auction.getName())
+            .description(auction.getDescription())
+            .startPrice(auction.getStartPrice())
+            .currentBid(auction.getCurrentBid())
+            .endTime(auction.getEndTime())
+            .minBidStep(auction.getMinBidStep())
             .build();
     }
 }

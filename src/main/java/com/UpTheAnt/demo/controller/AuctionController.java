@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -42,7 +43,14 @@ public class AuctionController {
         description = "Список аукционов успешно получен"
     )
     @GetMapping
-    public List<AuctionResponseDTO> getAllAuctions() {
+    public List<AuctionResponseDTO> getAllAuctions(
+            
+        @RequestParam(required = false) BigDecimal startPrice) {
+
+        if (startPrice != null) {
+            return (auctionService.findByStartPrice(startPrice));
+        }
+        
         return auctionService.getAllAuctions();
     }
 

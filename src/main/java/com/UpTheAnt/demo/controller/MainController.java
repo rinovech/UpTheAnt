@@ -39,6 +39,11 @@ public class MainController {
         return "allauctions"; 
     }
 
+    @GetMapping("/rublots")
+    public String rublots() {
+        return "rublots"; 
+    }
+
     @GetMapping("/auction/{id}")
     public String getAuctionPage(
         @PathVariable Integer id, 

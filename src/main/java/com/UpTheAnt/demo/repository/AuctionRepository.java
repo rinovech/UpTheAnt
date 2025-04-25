@@ -1,5 +1,6 @@
 package com.uptheant.demo.repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,4 +15,6 @@ public interface AuctionRepository extends JpaRepository<Auction, Integer> {
     List<Auction> findByStatusTrueAndEndTimeBefore(LocalDateTime currentTime);
 
     List<Auction> findByUser(User user);
+
+    List<Auction> findByStartPrice(BigDecimal startPrice);
 }

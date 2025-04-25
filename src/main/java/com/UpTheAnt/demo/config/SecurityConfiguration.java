@@ -65,7 +65,9 @@ public class SecurityConfiguration {
                     "/allauctions",
                     "/api/auctions/**",
                     "/auction/**",
-                    "auction.html"
+                    "auction.html",
+                    "/rublots",
+                    "rublots.html"
                 ).permitAll()
                 .requestMatchers("/api/users/**, /api/system/**","/api/bids/**").authenticated()
                 .anyRequest().authenticated()
