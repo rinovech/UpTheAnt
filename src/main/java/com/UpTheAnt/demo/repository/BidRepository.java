@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.uptheant.demo.model.Auction;
 import com.uptheant.demo.model.Bid;
+import com.uptheant.demo.model.User;
 
 public interface BidRepository extends JpaRepository<Bid, Integer> {
 
@@ -21,4 +22,6 @@ public interface BidRepository extends JpaRepository<Bid, Integer> {
     List<Bid> findByUserUserIdAndAuctionAuctionId(Integer userId, Integer auctionId);
 
     List<Bid> findByAuction(Auction auction);
+
+    List<Bid> findByUserOrderByBidTimeDesc(User user);
 }

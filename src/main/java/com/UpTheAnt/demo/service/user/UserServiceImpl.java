@@ -1,6 +1,7 @@
 package com.uptheant.demo.service.user;
 
 import com.uptheant.demo.dto.auction.AuctionParticipationDTO;
+import com.uptheant.demo.dto.user.UserActivityDTO;
 import com.uptheant.demo.dto.user.UserBidDTO;
 import com.uptheant.demo.dto.user.UserCreateDTO;
 import com.uptheant.demo.dto.user.UserResponseDTO;
@@ -22,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -199,6 +202,56 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
     
+    public List<UserActivityDTO> getUserActivities(String username, int limit) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        List<UserActivityDTO> activities = new ArrayList<>();
+
+        List<Auction> createdAuctions = auctionRepository.findByUserOrderByStartTimeDesc(user);
+        createdAuctions.stream()
+                .map(auction -> UserActivityDTO.builder()
+                        .type(UserActivityDTO.ActivityType.AUCTION_CREATED)
+                        .auctionName(auction.getName())
+                        .timestamp(auction.getStartTime())
+                        .build())
+                .forEach(activities::add);
+
+        List<Bid> userBids = bidRepository.findByUserOrderByBidTimeDesc(user);
+        userBids.stream()
+                .map(bid -> UserActivityDTO.builder()
+                        .type(UserActivityDTO.ActivityType.BID)
+                        .auctionName(bid.getAuction().getName())
+                        .amount(bid.getBidAmount())
+                        .timestamp(bid.getBidTime())
+                        .build())
+                .forEach(activities::add);
+
+        List<Auction> wonAuctions = auctionRepository.findWinningAuctionsByUser(user.getUserId());
+        wonAuctions.stream()
+                .map(auction -> UserActivityDTO.builder()
+                        .type(UserActivityDTO.ActivityType.AUCTION_WON)
+                        .auctionName(auction.getName())
+                        .amount(auction.getCurrentBid())
+                        .timestamp(auction.getEndTime())
+                        .build())
+                .forEach(activities::add);
+        
+        List<Auction> finishedAuctions = auctionRepository.findByUserOrderByEndTimeDesc(user);
+        finishedAuctions.stream()
+                .map(auction -> UserActivityDTO.builder()
+                        .type(UserActivityDTO.ActivityType.AUCTION_FINISHED)
+                        .auctionName(auction.getName())
+                        .timestamp(auction.getEndTime())
+                        .build())
+                .forEach(activities::add);
+
+        return activities.stream()
+                .sorted(Comparator.comparing(UserActivityDTO::getTimestamp).reversed())
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
 }
+
 
 

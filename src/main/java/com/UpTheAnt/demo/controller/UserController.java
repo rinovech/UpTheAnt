@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import com.uptheant.demo.dto.auction.AuctionParticipationDTO;
+import com.uptheant.demo.dto.user.UserActivityDTO;
 import com.uptheant.demo.dto.user.UserCreateDTO;
 import com.uptheant.demo.dto.user.UserResponseDTO;
 
@@ -159,5 +160,14 @@ public class UserController {
         List<AuctionParticipationDTO> participations = 
                 userService.getUserAuctionCreations(username);
         return ResponseEntity.ok(participations);
+    }
+
+    @GetMapping("/{username}/activities")
+    public ResponseEntity<List<UserActivityDTO>> getUserActivities(
+            @PathVariable String username,
+            @RequestParam(defaultValue = "20") int limit) {
+        
+        List<UserActivityDTO> activities = userService.getUserActivities(username, limit);
+        return ResponseEntity.ok(activities);
     }
 }
