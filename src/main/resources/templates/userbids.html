@@ -329,6 +329,7 @@
                 <div id="auctionsList">
                     <div class="loading">Загрузка данных...</div>
                 </div>
+                <button class="logout-btn" onclick="exportBids()"> Экспорт ставок в CSV </button>
             </div>
         </div>
     </div>
@@ -381,6 +382,7 @@
             }
 
             const token = localStorage.getItem('jwtToken');
+            
             if (!token) {
                 window.location.href = '/view/auth/login';
                 return;
@@ -515,6 +517,46 @@
         function logout() {
             localStorage.removeItem('jwtToken');
             window.location.href = '/';
+        }
+
+        async function exportBids() {
+            try {
+                const username = await getUsername();
+                if (!username) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const token = localStorage.getItem('jwtToken');
+
+                const response = await fetch(`/api/users/${username}/bid-export`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Accept': 'text/csv'
+                    },
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text(); 
+                    console.error('Error response body:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `my_bids_${new Date().toISOString().slice(0, 10)}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Failed to export bids: ' + error.message); 
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {

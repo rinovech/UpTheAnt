@@ -17,4 +17,5 @@ public interface UserService {
     List<AuctionParticipationDTO> getUserAuctionParticipations(String usernamed);
     List<AuctionParticipationDTO> getUserAuctionCreations(String usernamed);
     List<UserActivityDTO> getUserActivities(String username, int limit);
+    byte[] exportUserBidsToCsv(String username);
 }

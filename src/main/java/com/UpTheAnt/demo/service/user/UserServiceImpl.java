@@ -19,13 +19,22 @@ import com.uptheant.demo.service.validation.UserValidator;
 
 import lombok.RequiredArgsConstructor;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -170,6 +179,7 @@ public class UserServiceImpl implements UserService {
                 .userBids(userBids)
                 .build();
     }
+
     public List<AuctionParticipationDTO> getUserAuctionCreations(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
@@ -250,6 +260,50 @@ public class UserServiceImpl implements UserService {
                 .sorted(Comparator.comparing(UserActivityDTO::getTimestamp).reversed())
                 .limit(limit)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] exportUserBidsToCsv(String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        
+        List<Bid> bids = bidRepository.findByUserUserId(user.getUserId());
+        
+        try (
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+            CSVPrinter csvPrinter = CSVFormat.DEFAULT.builder()
+                .setHeader("Auction", "Bid Amount", "Bid Time", "Status", "End Time")
+                .setDelimiter(';')
+                .build()
+                .print(writer)
+        ) {
+
+            outputStream.write(0xEF);
+            outputStream.write(0xBB);
+            outputStream.write(0xBF);
+            
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+            
+            for (Bid bid : bids) {
+                Auction auction = bid.getAuction();
+                String status = auction.getEndTime().isAfter(LocalDateTime.now()) ? "Active" : "Finished";
+                
+                csvPrinter.printRecord(
+                    auction.getName(), 
+                    String.format(Locale.US, "%.2f ₽", bid.getBidAmount()), 
+                    bid.getBidTime().format(formatter),
+                    status,
+                    auction.getEndTime().format(formatter)
+                );
+            }
+            
+            csvPrinter.flush();
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to generate CSV", e);
+        }
     }
 }
 

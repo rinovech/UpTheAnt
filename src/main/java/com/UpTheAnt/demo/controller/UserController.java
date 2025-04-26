@@ -1,7 +1,9 @@
 package com.uptheant.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +27,8 @@ import com.uptheant.demo.dto.user.UserActivityDTO;
 import com.uptheant.demo.dto.user.UserCreateDTO;
 import com.uptheant.demo.dto.user.UserResponseDTO;
 
+import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -169,5 +173,32 @@ public class UserController {
         
         List<UserActivityDTO> activities = userService.getUserActivities(username, limit);
         return ResponseEntity.ok(activities);
+    }
+
+    @GetMapping(value = "/{username}/bid-export", produces = "text/csv")
+    public ResponseEntity<byte[]> exportUserBids(
+            @PathVariable String username,
+            Principal principal) {
+        
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!principal.getName().equals(username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+        try {
+            byte[] csvData = userService.exportUserBidsToCsv(username);
+            
+            String filename = "my_bids_" + LocalDate.now() + ".csv";
+            
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(csvData);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

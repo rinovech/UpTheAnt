@@ -69,7 +69,7 @@ public class SecurityConfiguration {
                     "/rublots",
                     "rublots.html"
                 ).permitAll()
-                .requestMatchers("/api/users/**, /api/system/**","/api/bids/**").authenticated()
+                .requestMatchers("/api/users/****, /api/system/**","/api/bids/****").authenticated()
                 .anyRequest().authenticated()
             )
             .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
